@@ -41,7 +41,6 @@ void readData(string **data, int r, int c){
 		}
 	}
 }
-
 double Entropy_function(int YES,int NO){//一個目標字串的熵 
 	double entropy;
 	int sum;
@@ -55,7 +54,6 @@ double Entropy_function(int YES,int NO){//一個目標字串的熵
 	printf("entropy==%f\n",entropy); //一個目標字串的熵 
 	return entropy;
 }
-
 //目前只找一個並計算熵，要找多個用遞迴，在哪裡做，應該是拆開來做 
 struct goalData findColAtt(string **data,int c,int r){ //找欄位內的所有屬性，r為第r行 
 	struct goalData colAtt; // 要陣列位置還是陣列本身?
@@ -75,39 +73,17 @@ struct goalData findColAtt(string **data,int c,int r){ //找欄位內的所有屬性，r為
 	return colAtt;
 }
 double Gain(double *E,int c){ // 要有兩個以上的才能算，故需要傳入陣列 
-	
-}/*
-void findMultgoal(string **data,int data_col){
-	int size=0;
-	int data_row=15;
-	bool reString[data_row]={0};
-	int array[size];
-	string coldata[data_row];printf("YES=%s\n","jijij");
-	for(int row=0;row<data_row;row++){
-		coldata[row]=data[row][data_col];
-	}
-	for(int i=0;i<data_row;i++){
-		if(reString[i]==0){
-			
-		}
-	}
-	printf("size=%d\n",size);
 }
-
-*/
-void findMultgoal(string **data,int data_col){
+void findMultgoal(string **data,int data_col){ //計算多個熵 
 	int size=4;
 	int data_row=15;
 	bool reString[data_row]={0};
 	struct goalData goalcolAttArray[4];
 	struct goalData *goalcolAtt; // 儲存目標欄位的內部各個屬性 n個 
 	goalcolAtt=goalcolAttArray; // 指標指向動態陣列 
-	
-for(int i=0;i<size;i++){	
-	
-	for(int row=0;row<data_row;row++){ // 每個都輪過一遍 
-		if(reString[row]==0){ // 如果沒經歷過 
-			
+	for(int i=0;i<size;i++){	
+		for(int row=0;row<data_row;row++){ // 每個都輪過一遍 
+			if(reString[row]==0){ // 如果沒經歷過 
 				//goalcolAtt[i].goalString=data[row][data_col]; //鎖定col，令row為目標
 				cout << reString[row]<<endl;
 				if(data[row][data_col]==goalcolAtt[i].goalString){
@@ -117,21 +93,17 @@ for(int i=0;i<size;i++){
 						goalcolAtt[i].goalNO+=1;
 					}	
 				}
-			
-			reString[row]=1;
+				reString[row]=1;
+			}
+			//cout << reString[row]<<endl;
+			goalcolAtt[i].goalString=data[0][data_col]; 
 		}
-		//cout << reString[row]<<endl;
-		goalcolAtt[i].goalString=data[0][data_col]; 
-	}
-} 
-
+	} 
 	printf("\nsize=%d\n",size) ;//	return goalcolAttArray;
 	for(int k=0;k<4;k++){
 		cout <<goalcolAtt[k].goalString<<endl;
 	}
 }
-
-
 void findMax(double a[]){
 	double Max=INT_MIN;
 	for(int i=0;i<5;i++){
@@ -140,13 +112,10 @@ void findMax(double a[]){
 		}
 	}	
 }
-
-
 int main() {
 	int data_row=15;
 	int data_col=6;  
 	string **data; //宣告矩陣 
-	
 	double goalentropy; //宣告一個目標字串的熵 
 	data=new string *[data_row]; //建立有data_row個string的陣列位址 
 	for(int i=0;i<data_row;i++){
@@ -154,19 +123,6 @@ int main() {
 	}
 	readData(data,data_row,data_col);
 	findMultgoal(data,1);
-	
-/*
-	for(int i=0;i<2;i++){
-		printf("count==%d\n",Y_N[i]);
-	}
-	goalentropy=Entropy_function(Y_N,2); //一個目標字串的熵 
-	struct goalData goalcolAttArray[4];
-	goalcolAtt=findColAtt(data,4,1); // 找一個並計算熵OK，輸入可從col,row (data,0,1)~(data,5,1) ，1也可變動 
-	
-	printf("goalcolstring=");
-	cout << goalcolAtt.goalString<< endl; */
-	
-	
 	printf("YES=%s\n","jijij");
 	return 0;
 }
