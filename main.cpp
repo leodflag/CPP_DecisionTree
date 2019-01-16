@@ -15,12 +15,12 @@ typedef struct Node TNode;
 typedef TNode *DecisionTree; // DecisionTree 本身是指標 
 struct goalData{  // 目標表單 
 	int goalcol; // 目標欄位 
-	string goalString; // 目標字串 
+	string goalString; // 目標字串 2個以上 
 	int goalYES=0; 
 	int goalNO=0;
 	double goalE; // 目標熵 
 };
-void readData(string **data, int r, int c){
+void readData(string **data, int r, int c){   
 	ifstream file("data_tree.csv");
 	int row;
 	int col;
@@ -42,31 +42,7 @@ void readData(string **data, int r, int c){
 	}
 }
 
-int *countNum(string **data,string goalString,int c){ // 輸入資料矩陣，目標字串，找第c欄 
-//	int countgoal=0;
-//	int countYes=0;
-//	int countNo=0;
-	static int Yes_No[2]={0,0}; //E[0]=Y  E[1]=N 
-	cout << goalString << endl;  
-	for(int row=1;row<15;row++){
-		if(goalString==data[row][c]){
-			if(data[row][5]=="Yes"){
-				Yes_No[0]+=1;
-			}else{
-				Yes_No[1]+=1;
-			}
-		//	countgoal++;
-		}
-	}
-	/*	
-	for(int i=0;i<2;i++){
-		printf("count==%d\n",E[i]);
-	}*/
-	//printf("goalString=%s , countgoal=%d , countYes=%d , countNo=%d\n",goalString,countgoal,countYes,countNo);
-	//printf(" countgoal=%d , countYes=%d , countNo=%d\n",countgoal,countYes,countNo);
-	return Yes_No;//回傳矩陣，要用指標 
-}
-double Entropy_function1(int YES,int NO){//一個目標字串的熵 
+double Entropy_function(int YES,int NO){//一個目標字串的熵 
 	double entropy;
 	int sum;
 	sum=YES+NO;
@@ -79,17 +55,9 @@ double Entropy_function1(int YES,int NO){//一個目標字串的熵
 	printf("entropy==%f\n",entropy); //一個目標字串的熵 
 	return entropy;
 }
-double Entropy_function(int p[],int p_size){
-	double entropy;
-	for(int i=0;i<p_size;i++){
-		entropy+=-(p[i]*log2(p[i]));
-	}
-	printf("entropy==%f\n",entropy); //一個目標字串的熵 
-	return entropy;
-}
 
 //目前只找一個並計算熵，要找多個用遞迴，在哪裡做，應該是拆開來做 
-void findColAtt(string **data,int c,int r){ //找欄位內的所有屬性，r為第r行 
+struct goalData findColAtt(string **data,int c,int r){ //找欄位內的所有屬性，r為第r行 
 	struct goalData colAtt; // 要陣列位置還是陣列本身?
 	colAtt.goalString=data[r][c];
 	for(int row=0;row<15;row++){ //每橫列 
@@ -100,14 +68,68 @@ void findColAtt(string **data,int c,int r){ //找欄位內的所有屬性，r為第r行
 				colAtt.goalNO+=1;
 			}
 		}
-	}cout << colAtt.goalString <<endl;
+	}
+	cout << colAtt.goalString <<endl;
 	printf("findColAtt  Yes=%d,No=%d\n",colAtt.goalYES,colAtt.goalNO);
-	colAtt.goalE=Entropy_function1(colAtt.goalYES,colAtt.goalNO);
+	colAtt.goalE=Entropy_function(colAtt.goalYES,colAtt.goalNO);
+	return colAtt;
 }
 double Gain(double *E,int c){ // 要有兩個以上的才能算，故需要傳入陣列 
 	
+}/*
+void findMultgoal(string **data,int data_col){
+	int size=0;
+	int data_row=15;
+	bool reString[data_row]={0};
+	int array[size];
+	string coldata[data_row];printf("YES=%s\n","jijij");
+	for(int row=0;row<data_row;row++){
+		coldata[row]=data[row][data_col];
+	}
+	for(int i=0;i<data_row;i++){
+		if(reString[i]==0){
+			
+		}
+	}
+	printf("size=%d\n",size);
 }
 
+*/
+void findMultgoal(string **data,int data_col){
+	int size=4;
+	int data_row=15;
+	bool reString[data_row]={0};
+	struct goalData goalcolAttArray[4];
+	struct goalData *goalcolAtt; // 儲存目標欄位的內部各個屬性 n個 
+	goalcolAtt=goalcolAttArray; // 指標指向動態陣列 
+	
+for(int i=0;i<size;i++){	
+	
+	for(int row=0;row<data_row;row++){ // 每個都輪過一遍 
+		if(reString[row]==0){ // 如果沒經歷過 
+			
+				//goalcolAtt[i].goalString=data[row][data_col]; //鎖定col，令row為目標
+				cout << reString[row]<<endl;
+				if(data[row][data_col]==goalcolAtt[i].goalString){
+					if(data[row][5]=="Yes"){
+						goalcolAtt[i].goalYES+=1;
+					}else{
+						goalcolAtt[i].goalNO+=1;
+					}	
+				}
+			
+			reString[row]=1;
+		}
+		//cout << reString[row]<<endl;
+		goalcolAtt[i].goalString=data[0][data_col]; 
+	}
+} 
+
+	printf("\nsize=%d\n",size) ;//	return goalcolAttArray;
+	for(int k=0;k<4;k++){
+		cout <<goalcolAtt[k].goalString<<endl;
+	}
+}
 
 
 void findMax(double a[]){
@@ -122,27 +144,27 @@ void findMax(double a[]){
 
 int main() {
 	int data_row=15;
-	int data_col=6; //[i][0]才能印出東西 
+	int data_col=6;  
 	string **data; //宣告矩陣 
-	struct goalData *goalcolAtt; //儲存目標欄位的內部各個屬性 
-	int *Y_N;//宣告指標，為儲存 countNum 的陣列 
+	
 	double goalentropy; //宣告一個目標字串的熵 
 	data=new string *[data_row]; //建立有data_row個string的陣列位址 
 	for(int i=0;i<data_row;i++){
 		data[i]=new string[data_col]; // 每條陣列位址內再加data_col個string的陣列位址 
 	}
-	readData(data,data_row,data_col);/*
-	for(int row=0;row<data_row;row++){    
-		for(int col=0;col<1;col++){
-			cout << data[row][0] << endl; 
-		}
-	}
-	Y_N=countNum(data,"Sunny",1);
+	readData(data,data_row,data_col);
+	findMultgoal(data,1);
+	
+/*
 	for(int i=0;i<2;i++){
 		printf("count==%d\n",Y_N[i]);
 	}
-	goalentropy=Entropy_function(Y_N,2); //一個目標字串的熵 */
-
+	goalentropy=Entropy_function(Y_N,2); //一個目標字串的熵 
+	struct goalData goalcolAttArray[4];
+	goalcolAtt=findColAtt(data,4,1); // 找一個並計算熵OK，輸入可從col,row (data,0,1)~(data,5,1) ，1也可變動 
+	
+	printf("goalcolstring=");
+	cout << goalcolAtt.goalString<< endl; */
 	
 	
 	printf("YES=%s\n","jijij");
