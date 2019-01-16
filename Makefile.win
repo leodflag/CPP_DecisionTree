@@ -10,8 +10,8 @@ LIBS     = -L"C:/Users/User/DevCppPortable/MinGW64/lib" -L"C:/Users/User/DevCppP
 INCS     = -I"C:/Users/User/DevCppPortable/MinGW64/include" -I"C:/Users/User/DevCppPortable/MinGW64/x86_64-w64-mingw32/include" -I"C:/Users/User/DevCppPortable/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include"
 CXXINCS  = -I"C:/Users/User/DevCppPortable/MinGW64/include" -I"C:/Users/User/DevCppPortable/MinGW64/x86_64-w64-mingw32/include" -I"C:/Users/User/DevCppPortable/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"C:/Users/User/DevCppPortable/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include/c++"
 BIN      = DecisionTree.exe
-CXXFLAGS = $(CXXINCS) 
-CFLAGS   = $(INCS) 
+CXXFLAGS = $(CXXINCS) -std=c++11
+CFLAGS   = $(INCS) -std=c++11
 RM       = rm.exe -f
 
 .PHONY: all all-before all-after clean clean-custom
