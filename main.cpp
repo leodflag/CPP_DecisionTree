@@ -5,21 +5,21 @@
 #include <stdio.h>
 #include <math.h>
 using namespace std;
-struct Node{
-	string data;
-	struct Node *left;
-	struct Node *middle;
-	struct Node *right;
-};
-typedef struct Node TNode;
-typedef TNode *DecisionTree; // DecisionTree 本身是指標 
 struct goalData{  // 目標表單 
-	int goalcol; // 目標欄位 
-	string goalString; // 目標字串 2個以上 
-	int goalYES=0; 
-	int goalNO=0;
+	string *nextNode; // 指標下個 node 
+	string goalString; // 目標字串 
+	int goalYES; 
+	int goalNO;
 	double goalE; // 目標熵 
 };
+struct Node{
+	string NodeData;
+	struct goalData left;
+	struct goalData middle;
+	struct goalData right;
+	double NodeE;
+}; 
+typedef struct Node DecisionTree;
 void readData(string **data, int r, int c){   
 	ifstream file("data_tree.csv");
 	int row;
@@ -54,75 +54,122 @@ double Entropy_function(int YES,int NO){//一個目標字串的熵
 	printf("entropy==%f\n",entropy); //一個目標字串的熵 
 	return entropy;
 }
-//目前只找一個並計算熵，要找多個用遞迴，在哪裡做，應該是拆開來做 
-struct goalData findColAtt(string **data,int c,int r){ //找欄位內的所有屬性，r為第r行 
-	struct goalData colAtt; // 要陣列位置還是陣列本身?
-	colAtt.goalString=data[r][c];
-	for(int row=0;row<15;row++){ //每橫列 
-		if(data[row][c]==colAtt.goalString){  //若目標字串等於第row橫列 
+struct goalData find_yes_no(string **data,int c,struct goalData str){
+	int sum=0;
+	str.goalYES=0;
+	str.goalNO=0;
+	cout<<"str="<<str.goalString<<endl;
+	for(int row=0;row<15;row++){  
+		cout<<"data[row][c]="<<data[row][c]<<endl;
+		if(str.goalString==data[row][c]){  
+			cout<<str.goalString<<endl;
+			
 			if(data[row][5]=="Yes"){
-				colAtt.goalYES+=1;
+				str.goalYES+=1;
+				cout<<"Y=="<<str.goalYES<<endl;
 			}else{
-				colAtt.goalNO+=1;
+				str.goalNO+=1;
+				cout<<"N=="<<str.goalNO<<endl;
 			}
 		}
-	}
-	cout << colAtt.goalString <<endl;
-	printf("findColAtt  Yes=%d,No=%d\n",colAtt.goalYES,colAtt.goalNO);
-	colAtt.goalE=Entropy_function(colAtt.goalYES,colAtt.goalNO);
-	return colAtt;
-}
-double Gain(double *E,int c){ // 要有兩個以上的才能算，故需要傳入陣列 
-}
-void findMultgoal(string **data,int data_col){ //計算多個熵 
-	int size=4;
-	int data_row=15;
-	bool reString[data_row]={0};
-	struct goalData goalcolAttArray[4];
-	struct goalData *goalcolAtt; // 儲存目標欄位的內部各個屬性 n個 
-	goalcolAtt=goalcolAttArray; // 指標指向動態陣列 
-	for(int i=0;i<size;i++){	
-		for(int row=0;row<data_row;row++){ // 每個都輪過一遍 
-			if(reString[row]==0){ // 如果沒經歷過 
-				//goalcolAtt[i].goalString=data[row][data_col]; //鎖定col，令row為目標
-				cout << reString[row]<<endl;
-				if(data[row][data_col]==goalcolAtt[i].goalString){
-					if(data[row][5]=="Yes"){
-						goalcolAtt[i].goalYES+=1;
-					}else{
-						goalcolAtt[i].goalNO+=1;
-					}	
-				}
-				reString[row]=1;
-			}
-			//cout << reString[row]<<endl;
-			goalcolAtt[i].goalString=data[0][data_col]; 
-		}
-	} 
-	printf("\nsize=%d\n",size) ;//	return goalcolAttArray;
-	for(int k=0;k<4;k++){
-		cout <<goalcolAtt[k].goalString<<endl;
-	}
-}
-void findMax(double a[]){
-	double Max=INT_MIN;
-	for(int i=0;i<5;i++){
-		if(a[i]>Max){
-			Max=a[i];	
-		}
+		cout<<row<<endl;
 	}	
+	str.goalE=Entropy_function(str.goalYES,str.goalNO);
+//	sum=str.goalYES+str.goalNO;
+//	cout<<sum<<endl;
+	return str;
 }
+//double Gain(
+DecisionTree findgoalS(string **data,string **data2,int c){ // 尋找不重複的，存入struct goalData，回傳字串陣列 
+	int row_len=15;
+	for(int i=0;i<row_len;i++){
+ 		for(int j=i+1;j<row_len;j++){
+ 			if(data[i][c]==data[j][c]){
+ 				for(int k=j+1;k<row_len;k++){
+ 					data[k-1][c]=data[k][c];
+				}
+				--row_len;
+				--j; 					
+			}
+		}
+	}
+	struct goalData *goalDptr; 
+	struct goalData goalD[row_len] ; // 建立 goalData的陣列 
+	for(int row=0;row<row_len;row++){
+		goalD[row].goalString=data[row][c]; // 矩陣成員 
+		cout<<"dataCol[k][c]jgkgk="<<data[row][c]<<endl;
+	}
+	DecisionTree TreeNode;
+	int YesAll=0, NoAll=0, All=0;
+	for(int r=0;r<row_len;r++){
+		if(r==0){
+			TreeNode.NodeData=goalD[0].goalString; 	// 第一個字是欄位 
+			}else if(r==1){
+				TreeNode.left.goalString=goalD[1].goalString;	 // 左指標指向的字 
+				TreeNode.left=find_yes_no(data2,c,TreeNode.left);
+				YesAll+=TreeNode.left.goalYES;
+				NoAll+=TreeNode.left.goalNO;
+				printf("YESALL=%d\n",YesAll);
+			}else if(r==2){
+				TreeNode.middle.goalString=goalD[2].goalString;	 // 中指標指向的字  
+				TreeNode.middle=find_yes_no(data2,c,TreeNode.middle);
+				YesAll+=TreeNode.middle.goalYES;
+				NoAll+=TreeNode.middle.goalNO;
+				printf("YESALL=%d\n",YesAll);
+			}else{
+				TreeNode.right.goalString=goalD[3].goalString;	 // 右指標指向的字  
+				TreeNode.right=find_yes_no(data2,c,TreeNode.right);
+				YesAll+=TreeNode.right.goalYES;
+				NoAll+=TreeNode.right.goalNO;
+				printf("YESALL=%d\n",YesAll);
+			}		
+	}
+	All=YesAll+NoAll;
+	printf("ALL=%d\n",All);
+	
+//	goalDptr=goalD; //將指標指向陣列的第一個位址 
+	return TreeNode; 
+}
+
+
 int main() {
+	//---------------讀取檔案data---------------- 
 	int data_row=15;
 	int data_col=6;  
 	string **data; //宣告矩陣 
-	double goalentropy; //宣告一個目標字串的熵 
 	data=new string *[data_row]; //建立有data_row個string的陣列位址 
 	for(int i=0;i<data_row;i++){
 		data[i]=new string[data_col]; // 每條陣列位址內再加data_col個string的陣列位址 
 	}
+	
+	string **data2; //宣告矩陣 
+	data2=new string *[data_row]; //建立有data_row個string的陣列位址 
+	for(int i=0;i<data_row;i++){
+		data2[i]=new string[data_col]; // 每條陣列位址內再加data_col個string的陣列位址 
+	}
 	readData(data,data_row,data_col);
-	findMultgoal(data,1);
-	printf("YES=%s\n","jijij");
+	readData(data2,data_row,data_col);
+	//--------------計算-----------------
+
+//	cout<<root1.left.goalString<<endl;
+//	for(int i=0;i<15;i++){
+//		cout<<"gougigkg"<<data[i][1]<<endl;
+//	}
+//	int IKO,yh;
+//	IKO=find_yes_no(data,1,root1.left);
+//	yh=find_yes_no(data,1,root1.middle);
+//	cout<<IKO<<endl;
+	struct goalData *goalStr;
+	DecisionTree TreeDataPtr;
+	TreeDataPtr=findgoalS(data,data2,4);  // 指標 
+	cout<<TreeDataPtr.middle.goalString<<endl; //指標取值 
+//	for(int i=0;i<15;i++){
+//		cout<<"iiii"<<data[i][1]<<endl;
+//	}
+	
+	
+//	TreeData=
+//	setValue(goalStr);
+//	cout<<TreeData.NodeData<<endl;
 	return 0;
 }
