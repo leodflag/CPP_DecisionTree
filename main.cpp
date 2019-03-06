@@ -3,51 +3,148 @@
 #include <sstream>
 #include <string>
 #include <stdio.h>
-#include <math.h>
-#include <limits> 
+#include <stdlib.h>
+#include <math.h>   //³Ì·sª©¥»!!!!!!!!!!!!!!!!!!2/19 ³Ì·s³Ì·sª©
 using namespace std;
-struct goalData{  // ¥Ø¼Ðªí³æ 
-	string nextNode; // «ü¼Ð¤U­Ó node 
-	string goalString; // ¥Ø¼Ð¦r¦ê 
-	int goalYES; 
-	int goalNO;
+struct goalData{  // ¥Ø¼Ðªí³æ
+	string nextNode; // «ü¼Ð¤U­Ó node !=NULL 
+	string goalString; // ¥Ø¼Ð¦r¦ê
+	int *goalrow; // ¥Ø¼Ð©Ò¦b°}¦C¦ì§} 
+	int goalYES;  // ¥Ø¼ÐYes¼Æ¶q	 
+	int goalNO;	  // ¥Ø¼ÐNo¼Æ¶q 
 	double goalE; // ¥Ø¼Ðæi 
 };
 typedef struct Node{
-	string NodeData;
-	struct goalData left;
-	struct goalData middle;
-	struct goalData right;
-	double NodeE;
-	double Gain;
-}DecisionTree; 
+	int col;  // ¦æ¼Æ 
+	string NodeData;  // Äæ¦ì 
+	struct goalData left;  // ¥ªÄÝ©Ê 
+	struct goalData middle; // ¤¤ÄÝ©Ê 
+	struct goalData right;  // ¥kÄÝ©Ê 
+	double NodeE;  // ¾ã­ÓÄæ¦ìÄÝ©Êªº æi 
+	double Gain;  //   
+}DecisionTree;
 typedef struct TNode{
-	string data;
-	struct TNode *next;
+	DecisionTree data;
+	struct TNode *LeftNode;
+	struct TNode *MiddleNode;
+	struct TNode *RightNode;
 }NODE;
+typedef NODE *DTree;
+DTree head=NULL;
+//---------ÀË´ú¨Mµ¦¾ð¬O§_¬OªÅªº-----------
+int isTreeEmpty() {
+	if(head==NULL) return 1;
+	else           return 0;
+}
+//---------¿é¤J¨Mµ¦¾ð-----------
+void createTreeNode(DecisionTree TreeNode){
+	DTree newNode, current;
+	int inserted=0; // ¬O§_¥[¤J·sªº¸`ÂI 
+//	newNode=(DTree) malloc(sizeof(NODE));
+	newNode= new NODE; 
+	newNode->data=TreeNode;
+	newNode->LeftNode=NULL;
+	newNode->MiddleNode=NULL;
+	newNode->RightNode=NULL;
+	if(isTreeEmpty()){ 
+		head=newNode; // «Ø¥ß®Ú¸`ÂI 
+	}else{
+		current=head;
+		while(!inserted){
+			if(current->LeftNode==NULL){
+				if(current->data.left.nextNode==newNode->data.NodeData){
+					current->LeftNode=newNode; // «Ø¥ß³sµ² 
+					cout<<"lkhoibiuobyiboyoibyuioyuiohnyuioynuiobuiniun"<<current->data.NodeData<<endl;
+					inserted=1; //³]¬°1 
+				}else{
+					current=current->LeftNode;
+				}
+			}else if(current->MiddleNode==NULL){
+				if(current->data.middle.nextNode==newNode->data.NodeData){
+					current->MiddleNode=newNode; 
+					inserted=1;
+				}else{
+					current=current->MiddleNode;
+				}
+			}else{
+				if(current->RightNode==NULL){
+					if(current->data.right.nextNode==newNode->data.NodeData){
+						current->RightNode=newNode;
+						inserted=1;
+					}else{
+						current=current->RightNode;
+					}
+				}
+			}
+		}
+	}
+}
 
-void readData(string **data, int r, int c){   
+//----------«Ø¥ß¨Mµ¦¾ð----------
+//void createDecisionTree(int len,string *Array){
+//	for(int i;i<len;i++){
+//		insertTreeNode(Array);
+//	}
+//}
+//----------ÅªÀÉ----------
+void readData(string **data, int r, int c){
 	ifstream file("data_tree.csv");
 	int row;
 	int col;
 	for(row=0;row<r;row++){
 		string line;
-		if(!getline(file,line)){  //±q¿é¤J¬yÅª¤J¤@¦æ¨ìstringÅÜ¶q¡Aª½¨ì¨S¦³0Åª¤J¦r²Å¡Bªð¦^false 
+		if(!getline(file,line)){  //±q¿é¤J¬yÅª¤J¤@¦æ¨ìstringÅÜ¶q¡Aª½¨ì¨S¦³0Åª¤J¦r²Å¡Bªð¦^false
 			break;
 		}
 		stringstream iss(line);  //±N¤@­Ó¦r²Å¦êstringÅÜ¶qlineªº­ÈÂà¦¨istringstreamÃþ§Oiss
-		if(!iss.good()){  //¦pªG¨S¿ù´N¦^¶ÇTrue 
+		if(!iss.good()){  //¦pªG¨S¿ù´N¦^¶ÇTrue
 			break;
 		}
 		for(col=0;col<c;col++){
 			string val;
-			getline(iss,val,',');  //¦r¦ê¤À³Î 
-			stringstream stringConvertorStringstream(val);  //±N¤@­Ó¦r²Å¦êÅÜ¶qªº­È¶Ç»¼µ¹istringstream¹ï¶H 
+			getline(iss,val,',');  //¦r¦ê¤À³Î
+			stringstream stringConvertorStringstream(val);  //±N¤@­Ó¦r²Å¦êÅÜ¶qªº­È¶Ç»¼µ¹istringstream¹ï¶H
 			stringConvertorStringstream>>data[row][col];  //¿é¤J¨ì¯x°}
 		}
 	}
 }
-double Entropy_function(int YES,int NO){//¤@­Ó¥Ø¼Ð¦r¦êªºæi 
+//----------«Ø¥ß­ì©l¸ê®Æ----------
+string** createBaseData(int data_row,int data_col){
+	string **data; //«Å§i¯x°}
+	data=new string *[data_row]; //«Ø¥ß¦³data_row­Óstringªº°}¦C¦ì§}
+	for(int i=0;i<data_row;i++){
+		data[i]=new string[data_col]; // ¨C±ø°}¦C¦ì§}¤º¦A¥[data_col­Óstringªº°}¦C¦ì§}
+	}
+	readData(data,data_row,data_col);
+	return data;
+}
+//---------¨ú±o¥Ø¼Ðª½¦æªº¦r¦ê°}¦C-----------
+string* returnGoalArray(int c){
+	int row_len=15,col_len=6;
+	string **data=createBaseData(row_len,col_len);
+	//----------§ä´Mª½¦æ¤ºªº¤£­«½ÆÄÝ©Ê----------
+	for(int i=0;i<row_len;i++){
+ 		for(int j=i+1;j<row_len;j++){
+ 			if(data[i][c]==data[j][c]){
+ 				for(int k=j+1;k<row_len;k++){
+ 					data[k-1][c]=data[k][c];
+				}
+				--row_len;
+				--j;
+			}
+		}
+	}
+	//---------±N§ä¨ìªºÄÝ©Ê§@¦¨°}¦C-----------
+	string *goalDArray=new string[4] ; // «Ø¥ß goalDataªº°}¦C
+	for(int row=0;row<row_len;row++){
+		goalDArray[row]=data[row][c]; // ¯x°}¦¨­û
+//		goalDArray[row]=goalD[row].goalString;
+		cout<<"goalDArray[row]"<<goalDArray[row]<<endl;
+	}
+	return goalDArray;
+}
+//----------æi­pºâ----------
+double Entropy_function(int YES,int NO){//¤@­Ó¥Ø¼Ð¦r¦êªºæi
 	double entropy;
 	int sum;
 	sum=YES+NO;
@@ -55,19 +152,23 @@ double Entropy_function(int YES,int NO){//¤@­Ó¥Ø¼Ð¦r¦êªºæi
 	double no;
 	yes=((double)YES/sum);
 	no=((double)NO/sum);
-//	printf("Y==%f,N==%f,sum=%d\n",yes,no,sum); 
+//	printf("Y==%f,N==%f,sum=%d\n",yes,no,sum);
 	entropy=-(yes*log2(yes))-(no*log2(no));
-//	printf("entropy==%f\n",entropy); //¤@­Ó¥Ø¼Ð¦r¦êªºæi 
+//	printf("entropy==%f\n",entropy); //¤@­Ó¥Ø¼Ð¦r¦êªºæi
 	return entropy;
 }
+//---------¨C¦æ¨C¦C¹ïÀ³ªºY/NO-----------  
 struct goalData find_yes_no(string **data,int c,struct goalData str){
-	int sum=0;
 	str.goalYES=0;
 	str.goalNO=0;
+	int goalrow[10],i=0;
 //	cout<<"str="<<str.goalString<<endl;
-	for(int row=0;row<15;row++){  
+	for(int row=0;row<15;row++){
 //		cout<<"data[row][c]="<<data[row][c]<<endl;
-		if(str.goalString==data[row][c]){  
+		if(str.goalString==data[row][c]){
+			goalrow[i]=row;
+			cout<<"goalrow[i]goalrow[i]="<<i<<"¡A"<<goalrow[i]<<endl;
+			i++;
 //			cout<<str.goalString<<endl;
 			if(data[row][5]=="Yes"){
 				str.goalYES+=1;
@@ -77,8 +178,7 @@ struct goalData find_yes_no(string **data,int c,struct goalData str){
 //				cout<<"N=="<<str.goalNO<<endl;
 			}
 		}
-//		cout<<row<<endl;
-	}	
+	}
 	if(str.goalYES==0){
 		str.nextNode="Yes";
 		str.goalE=0.0;
@@ -88,61 +188,67 @@ struct goalData find_yes_no(string **data,int c,struct goalData str){
 	}else{
 		str.goalE=Entropy_function(str.goalYES,str.goalNO);
 	}
+	str.goalrow=goalrow;
 	return str;
 }
-DecisionTree findgoalS(string **data,string **data2,int c){ // ´M§ä¤£­«½Æªº¡A¦s¤Jstruct goalData¡A¦^¶Ç¦r¦ê°}¦C 
-	int row_len=15;
-	for(int i=0;i<row_len;i++){
- 		for(int j=i+1;j<row_len;j++){
- 			if(data[i][c]==data[j][c]){
- 				for(int k=j+1;k<row_len;k++){
- 					data[k-1][c]=data[k][c];
+string** make_goal_data(string GoalStr,int data_row,int data_col,int c){  //¤pªí 
+//	=15;
+//	=6;
+	string **Data=createBaseData(data_row,data_col);
+	for(int r=1;r<data_row;r++){
+		if(Data[r][c]!=GoalStr){ // ­Y¤£µ¥©ó¥Ø¼Ð 
+			for(int j=r+1;j<data_row;j++){
+				for(int col=0;col<data_col;col++){  // ¨ú¤U­Ó¾î¦C 
+					Data[j-1][col]=Data[j][col];  //  ©ñ¦^«e¾î¦C 
 				}
-				--row_len;
-				--j; 					
 			}
+			--data_row;
+			--r;
 		}
-	}
-	struct goalData *goalDptr; 
-	struct goalData goalD[row_len] ; // «Ø¥ß goalDataªº°}¦C 
-	for(int row=0;row<row_len;row++){
-		goalD[row].goalString=data[row][c]; // ¯x°}¦¨­û 
-//		cout<<"dataCol[k][c]jgkgk="<<data[row][c]<<endl;
-	}
+	}	
+
+	return Data;
+}
+//----------§ä´M¥Ø¼ÐÄæ¦ìGain­È----------
+DecisionTree findgoalS(string **data2,string *array,int c){ // ´M§ä¤£­«½Æªº¡A¦s¤Jstruct goalData¡A¦^¶Ç¦r¦ê°}¦C
+	//---------­pºâ¦æ¤º¤£¦PÄÝ©ÊªºY/N­Ó¼Æ-----------
 	DecisionTree TreeNode;
-	int YesAll=0, NoAll=0, All=0, leftN=0, middleN=0, rightN=0; 
-	for(int r=0;r<row_len;r++){
+	int YesAll=0, NoAll=0, All=0, leftN=0, middleN=0, rightN=0, r=0;
+	while(r!=4){
 		if(r==0){
-			TreeNode.NodeData=goalD[0].goalString; 	// ²Ä¤@­Ó¦r¬OÄæ¦ì 
-			}else if(r==1){
-				TreeNode.left.goalString=goalD[1].goalString;	 // ¥ª«ü¼Ð«ü¦Vªº¦r 
-				TreeNode.left=find_yes_no(data2,c,TreeNode.left);
-				leftN=TreeNode.left.goalYES+TreeNode.left.goalNO;
-				cout<<"leftN="<<leftN<<endl;
-				YesAll+=TreeNode.left.goalYES;
-				NoAll+=TreeNode.left.goalNO;
-			}else if(r==2){
-				TreeNode.middle.goalString=goalD[2].goalString;	 // ¤¤«ü¼Ð«ü¦Vªº¦r  
-				TreeNode.middle=find_yes_no(data2,c,TreeNode.middle);
-				middleN=TreeNode.middle.goalYES+TreeNode.middle.goalNO;
-				cout<<"middleN="<<middleN<<endl;
-				YesAll+=TreeNode.middle.goalYES;
-				NoAll+=TreeNode.middle.goalNO;
-			}else{
-				TreeNode.right.goalString=goalD[3].goalString;	 // ¥k«ü¼Ð«ü¦Vªº¦r  
-				TreeNode.right=find_yes_no(data2,c,TreeNode.right);
-				rightN=TreeNode.right.goalYES+TreeNode.right.goalNO;
-				cout<<"rightN="<<rightN<<endl;
-				YesAll+=TreeNode.right.goalYES;
-				NoAll+=TreeNode.right.goalNO;
-			}		
+			TreeNode.NodeData=array[r]; 	// ²Ä¤@­Ó¦r¬OÄæ¦ì
+		}else if(r==1){
+			TreeNode.left.goalString=array[r]; 	 // ¥ª«ü¼Ð«ü¦Vªº¦r
+			TreeNode.left=find_yes_no(data2,c,TreeNode.left);
+			leftN=TreeNode.left.goalYES+TreeNode.left.goalNO;
+			cout<<"leftN="<<leftN<<endl;
+			YesAll+=TreeNode.left.goalYES;
+			NoAll+=TreeNode.left.goalNO;
+		}else if(r==2){
+			TreeNode.middle.goalString=array[r]; 	 // ¤¤«ü¼Ð«ü¦Vªº¦r
+			TreeNode.middle=find_yes_no(data2,c,TreeNode.middle);
+			middleN=TreeNode.middle.goalYES+TreeNode.middle.goalNO;
+			cout<<"middleN="<<middleN<<endl;
+			YesAll+=TreeNode.middle.goalYES;
+			NoAll+=TreeNode.middle.goalNO;
+		}else if(r==3){
+			TreeNode.right.goalString=array[r]; 	 // ¥k«ü¼Ð«ü¦Vªº¦r
+			TreeNode.right=find_yes_no(data2,c,TreeNode.right);
+			rightN=TreeNode.right.goalYES+TreeNode.right.goalNO;
+			cout<<"rightN="<<rightN<<endl;
+			YesAll+=TreeNode.right.goalYES;
+			NoAll+=TreeNode.right.goalNO;
+		}else{
+			break;
+		}
+		r++;
 	}
 	printf("NOALL=%d\n",NoAll);
 	printf("YESALL=%d\n",YesAll);
+	//----------­pºâ¥Ø¼ÐGain­È----------
 	All=YesAll+NoAll;
 	cout<<"ALL="<<All<<endl;
 	TreeNode.NodeE=Entropy_function(YesAll,NoAll);
-	cout<<"TreeNode.Gain="<<TreeNode.Gain<<endl;
 	cout<<"(double)leftN/All*TreeNode.left.goalE=="<<(double)leftN/All*TreeNode.left.goalE<<endl;
 	cout<<"(double)middleN/All*TreeNode.middle.goalE="<<(double)middleN/All*TreeNode.middle.goalE<<endl;
 	cout<<"(double)rightN/All*TreeNode.right.goalE="<<(double)rightN/All*TreeNode.right.goalE<<endl;
@@ -150,101 +256,62 @@ DecisionTree findgoalS(string **data,string **data2,int c){ // ´M§ä¤£­«½Æªº¡A¦s¤
 								-(double)middleN/All*TreeNode.middle.goalE\
 								-(double)rightN/All*TreeNode.right.goalE;
 	printf("TreeNode.Gain=%f\n",TreeNode.Gain);
-	
-//	goalDptr=goalD; //±N«ü¼Ð«ü¦V°}¦Cªº²Ä¤@­Ó¦ì§} 
-	return TreeNode; 
+	if(TreeNode.right.goalString==""){
+		cout<<"TreeNode.right.goalString===NULL"<<endl;
+	}
+	return TreeNode;
 }
-double findgoalSNUM(string **data,string **data2,int c){ // ´M§ä¤£­«½Æªº¡A¦s¤Jstruct goalData¡A¦^¶Ç¦r¦ê°}¦C 
-	int row_len=15;
-	for(int i=0;i<row_len;i++){
- 		for(int j=i+1;j<row_len;j++){
- 			if(data[i][c]==data[j][c]){
- 				for(int k=j+1;k<row_len;k++){
- 					data[k-1][c]=data[k][c];
-				}
-				--row_len;
-				--j; 					
-			}
-		}
-	}
-	struct goalData *goalDptr; 
-	struct goalData goalD[row_len] ; // «Ø¥ß goalDataªº°}¦C 
-	for(int row=0;row<row_len;row++){
-		goalD[row].goalString=data[row][c]; // ¯x°}¦¨­û 
-//		cout<<"dataCol[k][c]jgkgk="<<data[row][c]<<endl;
-	}
-	DecisionTree TreeNode;
-	int YesAll=0, NoAll=0, All=0, leftN=0, middleN=0, rightN=0; 
-	for(int r=0;r<row_len;r++){
-		if(r==0){
-			TreeNode.NodeData=goalD[0].goalString; 	// ²Ä¤@­Ó¦r¬OÄæ¦ì 
-			}else if(r==1){
-				TreeNode.left.goalString=goalD[1].goalString;	 // ¥ª«ü¼Ð«ü¦Vªº¦r 
-				TreeNode.left=find_yes_no(data2,c,TreeNode.left);
-				leftN=TreeNode.left.goalYES+TreeNode.left.goalNO;
-//				cout<<"leftN="<<leftN<<endl;
-				YesAll+=TreeNode.left.goalYES;
-				NoAll+=TreeNode.left.goalNO;
-			}else if(r==2){
-				TreeNode.middle.goalString=goalD[2].goalString;	 // ¤¤«ü¼Ð«ü¦Vªº¦r  
-				TreeNode.middle=find_yes_no(data2,c,TreeNode.middle);
-				middleN=TreeNode.middle.goalYES+TreeNode.middle.goalNO;
-				YesAll+=TreeNode.middle.goalYES;
-				NoAll+=TreeNode.middle.goalNO;
-			}else{
-				TreeNode.right.goalString=goalD[3].goalString;	 // ¥k«ü¼Ð«ü¦Vªº¦r  
-				TreeNode.right=find_yes_no(data2,c,TreeNode.right);
-				rightN=TreeNode.right.goalYES+TreeNode.right.goalNO;
-				YesAll+=TreeNode.right.goalYES;
-				NoAll+=TreeNode.right.goalNO;
-			}		
-	}
-//	printf("NOALL=%d\n",NoAll);
-//	printf("YESALL=%d\n",YesAll);
-	All=YesAll+NoAll;
-//	cout<<"ALL="<<All<<endl;
-	TreeNode.NodeE=Entropy_function(YesAll,NoAll);
-//	cout<<"(leftN/All)*TreeNode.left.goalE=="<<(double)leftN/All<<endl;
-	TreeNode.Gain=TreeNode.NodeE-(double)leftN/All*TreeNode.left.goalE\
-								-(double)middleN/All*TreeNode.middle.goalE\
-								-(double)rightN/All*TreeNode.right.goalE;
-//	printf("TreeNode.Gain=%f\n",TreeNode.Gain);
-	
-//	goalDptr=goalD; //±N«ü¼Ð«ü¦V°}¦Cªº²Ä¤@­Ó¦ì§} 
-	return TreeNode.Gain; 
-}
-
-int main() {
-	//---------------Åª¨úÀÉ®×data---------------- 
-	int data_row=15;
-	int data_col=6;  
-	string **data; //«Å§i¯x°} 
-	data=new string *[data_row]; //«Ø¥ß¦³data_row­Óstringªº°}¦C¦ì§} 
-	for(int i=0;i<data_row;i++){
-		data[i]=new string[data_col]; // ¨C±ø°}¦C¦ì§}¤º¦A¥[data_col­Óstringªº°}¦C¦ì§} 
-	}
-	
-	string **data2; //«Å§i¯x°} 
-	data2=new string *[data_row]; //«Ø¥ß¦³data_row­Óstringªº°}¦C¦ì§} 
-	for(int i=0;i<data_row;i++){
-		data2[i]=new string[data_col]; // ¨C±ø°}¦C¦ì§}¤º¦A¥[data_col­Óstringªº°}¦C¦ì§} 
-	}
-	readData(data,data_row,data_col);
-	readData(data2,data_row,data_col);
-	//--------------­pºâ-----------------
-
-	DecisionTree TreeDataPtr;
-	struct TNode DTNode;
-//	TreeDataPtr=findgoalS(data,data2,1);  // «ü¼Ð 
-	
+//
+//-------------§ä´M³Ì¤jGain­È-----------------
+DecisionTree findMaxGain(string **data,int col){ 
+	DecisionTree goalNode,MaxNode;
+	string *goalsArray,*MaxGoalSArray;
+	int i;
 	double MaxGain=0.0,Gain=0.0;
-	for(int i=1;i<5;i++){
-		Gain=findgoalSNUM(data,data2,i);
+	for(i=1;i<col;i++){  //5Äæ 
+		goalsArray=returnGoalArray(i); //¨ú±o¨C¦æÄÝ©Ê 
+//		if(goalsArray[i-1]!=""){
+//			data=make_goal_data(goalsArray[i-1],i);
+//		}
+		goalNode=findgoalS(data,goalsArray,i); //§ä¨ì©Ò¦³ÄÝ©Êªº¸ê®Æ 
+		Gain=goalNode.Gain; //¨ú±oGain­È 
 		cout<<i<<"¡AGain="<<Gain<<endl;
 		if(Gain>MaxGain){
+			goalNode.col=i;
 			MaxGain=Gain;
+			MaxNode=goalNode;
+			MaxGoalSArray=goalsArray;
 		}
 	}
+//	createTreeNode(MaxNode);
 	cout<<"MaxGain="<<MaxGain<<endl;
+	cout<<"MaxNode="<<MaxNode.NodeData<<endl;
+	return 	MaxNode;
+}
+void inOrder(DTree ptr){
+    while(ptr!=NULL){
+        inOrder(ptr->LeftNode);
+//        printf("%s",ptr->data.NodeData);
+        inOrder(ptr->MiddleNode);
+        inOrder(ptr->RightNode);
+    }
+}
+void printInOrder(){
+    inOrder(head);
+    printf("\n");
+}
+int main() {
+	//---------------Åª¨úÀÉ®×data----------------
+	int data_row=15;
+	int data_col=6;
+	DecisionTree MaxNode,MaxNode2;
+	string **data=createBaseData(data_row,data_col);
+	MaxNode=findMaxGain(data,5); //§ä¨ì³Ì¤j 
+	createTreeNode(MaxNode); //«Ø¾ð 
+	string* goalArray=returnGoalArray(MaxNode.col); // §ä³Ì¤jÄæªº¦r¦ê¦ê¦C 
+	// °µ¤pªí 
+	string **data2=make_goal_data(goalArray[1],15,6,1);
+	MaxNode2=findMaxGain(data2,4);
+
 	return 0;
 }
