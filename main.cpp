@@ -50,9 +50,9 @@ int isTreeEmpty() {
 void createTreeNode(DecisionTree TreeNode){
 	DTree newNode, current;
 	int inserted=0; // ¬O§_¥[¤J·sªº¸`ÂI 
-	newNode=(DTree) malloc(sizeof(NODE));
+//	newNode=(DTree) malloc(sizeof(NODE));
 ////newnode = (BTree) malloc(sizeof(TNode)); 
-//	newNode= new NODE; 
+	newNode= new NODE; 
 	newNode->data=TreeNode;
 	newNode->LeftNode=NULL;
 	newNode->MiddleNode=NULL;
@@ -200,27 +200,6 @@ struct goalData find_yes_no(Data_Str data,int c,struct goalData str){
 	str.goalrow=goalrow;
 	return str;
 }
-//////³o­Ó¬O¹ïªº!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
-//string** make_goal_data(string GoalStr,int data_row,int data_col,int c){  
-//	string **Data=createBaseData(data_row,data_col);
-//	for(int r=1;r<data_row;r++){
-//		if(Data[r][c]!=GoalStr){ // ­Y¤£µ¥©ó¥Ø¼Ð 
-//			for(int j=r+1;j<data_row;j++){
-//				for(int col=0;col<data_col;col++){  // ¨ú¤U­Ó¾î¦C 
-//					Data[j-1][col]=Data[j][col];  //  ©ñ¦^«e¾î¦C 
-//				}
-//			}
-//			--data_row;
-//			--r;
-//		}
-//	}	
-//	for(int j=0;j<data_row;j++){   //³o­Ó¬O¹ïªº!!!!!! 
-//		for(int i=0;i<data_col;i++){
-//			cout<<"make_goal_data¡A"<<Data[i][j]<<endl;
-//		}
-//	}
-//	return Data;
-//}
 Data_Str make_goal_data(string GoalStr,int c){  //¤pªí ¡G¥Ø¼Ð¦r¡A©Ò¦bÄæ¦ì    OKKKKKKKKKKKKKKKKKKKKK
 	int data_row=15;
 	int data_col=6;
@@ -248,7 +227,7 @@ Data_Str make_goal_data(string GoalStr,int c){  //¤pªí ¡G¥Ø¼Ð¦r¡A©Ò¦bÄæ¦ì    OKK
 	return Data;
 }
 //----------§ä´M¥Ø¼ÐÄæ¦ìGain­È----------
-DecisionTree findgoalS(Data_Str data2,string *array,int c){ // ´M§ä¤£­«½Æªº¡A¦s¤Jstruct goalData¡A¦^¶Ç¦r¦ê°}¦C
+DecisionTree findgoalS(Data_Str data,string *array,int c){ // ´M§ä¤£­«½Æªº¡A¦s¤Jstruct goalData¡A¦^¶Ç¦r¦ê°}¦C
 	//---------­pºâ¦æ¤º¤£¦PÄÝ©ÊªºY/N­Ó¼Æ-----------
 	DecisionTree TreeNode;
 	int YesAll=0, NoAll=0, All=0, leftN=0, middleN=0, rightN=0, r=0;
@@ -257,21 +236,21 @@ DecisionTree findgoalS(Data_Str data2,string *array,int c){ // ´M§ä¤£­«½Æªº¡A¦s¤
 			TreeNode.NodeData=array[r]; 	// ²Ä¤@­Ó¦r¬OÄæ¦ì
 		}else if(r==1){
 			TreeNode.left.goalString=array[r]; 	 // ¥ª«ü¼Ð«ü¦Vªº¦r
-			TreeNode.left=find_yes_no(data2,c,TreeNode.left);
+			TreeNode.left=find_yes_no(data,c,TreeNode.left);
 			leftN=TreeNode.left.goalYES+TreeNode.left.goalNO;
 			cout<<"leftN="<<leftN<<endl;
 			YesAll+=TreeNode.left.goalYES;
 			NoAll+=TreeNode.left.goalNO;
 		}else if(r==2){
 			TreeNode.middle.goalString=array[r]; 	 // ¤¤«ü¼Ð«ü¦Vªº¦r
-			TreeNode.middle=find_yes_no(data2,c,TreeNode.middle);
+			TreeNode.middle=find_yes_no(data,c,TreeNode.middle);
 			middleN=TreeNode.middle.goalYES+TreeNode.middle.goalNO;
 			cout<<"middleN="<<middleN<<endl;
 			YesAll+=TreeNode.middle.goalYES;
 			NoAll+=TreeNode.middle.goalNO;
 		}else if(r==3){
 			TreeNode.right.goalString=array[r]; 	 // ¥k«ü¼Ð«ü¦Vªº¦r
-			TreeNode.right=find_yes_no(data2,c,TreeNode.right);
+			TreeNode.right=find_yes_no(data,c,TreeNode.right);
 			rightN=TreeNode.right.goalYES+TreeNode.right.goalNO;
 			cout<<"rightN="<<rightN<<endl;
 			YesAll+=TreeNode.right.goalYES;
@@ -287,6 +266,7 @@ DecisionTree findgoalS(Data_Str data2,string *array,int c){ // ´M§ä¤£­«½Æªº¡A¦s¤
 	All=YesAll+NoAll;
 	cout<<"ALL="<<All<<endl;
 	TreeNode.NodeE=Entropy_function(YesAll,NoAll);
+	printf("ALL¡ATreeNode.NodeE=%f\n",TreeNode.NodeE);
 	cout<<"(double)leftN/All*TreeNode.left.goalE=="<<(double)leftN/All*TreeNode.left.goalE<<endl;
 	cout<<"(double)middleN/All*TreeNode.middle.goalE="<<(double)middleN/All*TreeNode.middle.goalE<<endl;
 	cout<<"(double)rightN/All*TreeNode.right.goalE="<<(double)rightN/All*TreeNode.right.goalE<<endl;
@@ -299,36 +279,6 @@ DecisionTree findgoalS(Data_Str data2,string *array,int c){ // ´M§ä¤£­«½Æªº¡A¦s¤
 	}
 	return TreeNode;
 }
-////
-////-------------§ä´M³Ì¤jGain­È-----------------
-//void findMaxGain(string **data){ 
-//	DecisionTree goalNode,MaxNode;
-//	string *goalsArray,*MaxGoalSArray;
-//	int i;
-//	double MaxGain=0.0,Gain=0.0;
-//	for(i=1;i<5;i++){  //5Äæ 
-//		goalsArray=returnGoalArray(i); //¨ú±o¨C¦æÄÝ©Ê 
-////		if(goalsArray[i-1]!=""){
-////			data=make_goal_data(goalsArray[i-1],i);
-////		}
-//		goalNode=findgoalS(data,goalsArray,i); //§ä¨ì©Ò¦³ÄÝ©Êªº¸ê®Æ 
-//		Gain=goalNode.Gain; //¨ú±oGain­È 
-//		cout<<i<<"¡AGain="<<Gain<<endl;
-//		if(Gain>MaxGain){
-//			goalNode.col=i;
-//			MaxGain=Gain;
-//			MaxNode=goalNode;
-//			MaxGoalSArray=goalsArray;
-//		}
-//	}
-////	createTreeNode(MaxNode);
-//	cout<<"MaxGain="<<MaxGain<<endl;
-//	cout<<"MaxNode="<<MaxNode.NodeData<<endl;
-//	for(int j=0;j<4;j++){
-//		string **DATA=make_goal_data(MaxGoalSArray[j],15,6,goalNode.col);
-//		findMaxGain(DATA);
-//	}
-//}
 //-------------§ä´M³Ì¤jGain­È-----------------
 DecisionTree findMaxGain(Data_Str data){ 
 	DecisionTree goalNode,MaxNode;
@@ -336,11 +286,8 @@ DecisionTree findMaxGain(Data_Str data){
 //	Data_Str Data
 	int i;
 	double MaxGain=0.0,Gain=0.0;
-	for(i=1;i<4;i++){  //1~4Äæ 
+	for(i=1;i<5;i++){  //1~4Äæ 
 		goalsArray=returnGoalArray(i); //¨ú±o¨C¦æÄÝ©Ê 
-//		if(goalsArray[i-1]!=""){
-//			data=make_goal_data(goalsArray[i-1],i);
-//		}
 		goalNode=findgoalS(data,goalsArray,i); //§ä¨ì©Ò¦³ÄÝ©Êªº¸ê®Æ 
 		Gain=goalNode.Gain; //¨ú±oGain­È 
 		cout<<i<<"¡AGain="<<Gain<<endl;
@@ -377,32 +324,26 @@ int main() {
 	Data_Str data,data2;
 	data.D_row=15;
 	data.D_col=6;
-	int iteration=5;
 	DecisionTree MaxNode,MaxNode2;
-	
 	data.Data=createBaseData(data.D_row,data.D_col);
-	
-//	findMaxGain(data.Data); //§ä¨ì³Ì¤j
 	MaxNode=findMaxGain(data);
+	cout<<"-------------²Ä¤@­Ó³Ì¤j¥X²{©Ô-----------³o¸Ì¬O¤À¬É½u------------------------------------------"<<endl; 
 //	createTreeNode(MaxNode); //«Ø¾ð 
 //	printInOrder();
 //	inOrder(MaxNode);
 	string* goalArray=returnGoalArray(MaxNode.col); // §ä³Ì¤jÄæªº¦r¦ê¦ê¦C 
-////	// °µ¤pªí 
-	for(int i=0;i<4;i++){
-		cout<<*(goalArray+i)<<endl;
-	}
+//	for(int i=0;i<4;i++){
+//		cout<<*(goalArray+i)<<endl;
+//	}
+	data2=make_goal_data(goalArray[1],MaxNode.col);  //­n§ï 	
+	MaxNode2=findMaxGain(data2);	
+	cout<<"-------------338&339³£¹ï°Õ-----------³o¸Ì¬O¤À¬É½u------------------------------------------"<<endl; 
+	Data_Str data3; 
+	data3=make_goal_data(goalArray[3],MaxNode.col);  //­n§ï 
+	MaxNode=findMaxGain(data3);	
+	cout<<"-------------²Ä¤G¨B°µ¥X¨Ó°Õ-----------³o¸Ì¬O¤À¬É½u------------------------------------------"<<endl;    
 
-	for(int i=1;i<4;i++){
-		data2=make_goal_data(goalArray[i],MaxNode.col);  //­n§ï 	
-		MaxNode=findMaxGain(data2);	
-		cout<<"-------------²Ä¤G¨B°µ¥X¨Ó°Õ-----------³o¸Ì¬O¤À¬É½u------------------------------------------"<<endl; 
-//    	string **data3=make_goal_data(goalArray[i],15,6,MaxNode.col);   
-	}
-//	string S="Sunny";
-//	data2=make_goal_data(S,1);  
-//	MaxNode2=findMaxGain(data2);
-//	MaxNode2=findMaxGain(data2,4);
+	
 	
 	return 0;
 }
