@@ -66,6 +66,7 @@ void createTreeNode(DecisionTree TreeNode,string goalStr){
 		newNode->LeftNode=NO;
 	}else{
 		newNode->LeftNode=new NODE;
+		newNode->LeftNode->data.NodeData="";
 	}
 	if(TreeNode.middle.nextNode=="Yes"){
 		newNode->MiddleNode=YES;
@@ -73,6 +74,7 @@ void createTreeNode(DecisionTree TreeNode,string goalStr){
 		newNode->MiddleNode=NO;
 	}else{
 		newNode->MiddleNode=new NODE;
+		newNode->MiddleNode->data.NodeData="";
 	}
 	if(TreeNode.right.nextNode=="Yes"){
 		newNode->RightNode=YES;
@@ -80,6 +82,7 @@ void createTreeNode(DecisionTree TreeNode,string goalStr){
 		newNode->RightNode=NO;
 	}else{
 		newNode->RightNode=new NODE;
+		newNode->RightNode->data.NodeData="";
 	}
 	cout<<"newNode->data.NodeData，"<<newNode->data.NodeData<<endl;
 	cout<<"newNode->LeftNode->data.NodeData，"<<newNode->LeftNode->data.NodeData<<endl;
@@ -220,13 +223,17 @@ struct goalData find_yes_no(Data_Str data,int c,struct goalData str){
 			}
 		}
 	}
+	int dif=str.goalYES-str.goalNO;
+	cout<<"int dif=str.goalYES-str.goalNO;int dif=str.goalYES-str.goalNO;，，，"<<dif<<endl;
 	if(str.goalYES==0){ //如果yes完全沒有 
 		str.nextNode="No"; //令下一個節點為no 
 		str.goalE=0.0;  //熵設為0 
 	}else if(str.goalNO==0){
 		str.nextNode="Yes";
 		str.goalE=0.0;
-	}else{
+	}
+	
+	else{
 		str.goalE=Entropy_function(str.goalYES,str.goalNO);
 	}
 	str.goalrow=goalrow;
@@ -354,23 +361,43 @@ DecisionTree findMaxGain(Data_Str data){
 	return 	MaxNode;
 }
 void inOrder(DTree ptr){
-    while(ptr!=NULL){
-        inOrder(ptr->LeftNode);
+    if(ptr->data.NodeData!="")   //改if 
         cout<<ptr->data.NodeData<<endl;
+    else 
+    	return;
+        inOrder(ptr->LeftNode);
         inOrder(ptr->MiddleNode);
         inOrder(ptr->RightNode);
-    }
+    
 }
-void printInOrder(){
-    inOrder(head);
-    printf("\n");
-}
+
 void GO(string *goalArray,int MAX_Col){
 	DecisionTree MaxNode;
 	for(int i=1;i<4;i++){
 		if(goalArray[i]!=""){
 			Data_Str data=make_goal_data(goalArray[i],MAX_Col);  //根據SUNNY製作DATA 
 			MaxNode=findMaxGain(data); //在SUNNY的資料裡找最大    跟著畫一次決策樹 
+			if(MaxNode.left.nextNode==""){
+				if(MaxNode.left.goalYES>MaxNode.left.goalNO){
+					MaxNode.left.nextNode="Yes";
+				}else{
+					MaxNode.left.nextNode="No";
+				}				
+			}
+			if(MaxNode.middle.nextNode==""){
+				if(MaxNode.middle.goalYES>MaxNode.middle.goalNO){
+					MaxNode.middle.nextNode="Yes";
+				}else{
+					MaxNode.middle.nextNode="No";
+				}				
+			}
+			if(MaxNode.right.nextNode==""){
+				if(MaxNode.right.goalYES>MaxNode.right.goalNO){
+					MaxNode.right.nextNode="Yes";
+				}else{
+					MaxNode.right.nextNode="No";
+				}				
+			}
 			createTreeNode(MaxNode,goalArray[i]); //建樹 
 						
 		}
@@ -390,16 +417,8 @@ int main() {
 	cout<<MaxNode.middle.goalString<<endl;
 	createTreeNode(MaxNode,MaxNode.middle.goalString); //建樹 
 	string *goalArray=returnGoalArray(MaxNode.col); // 找最大欄的字串串列 
-//	string Node=goalArray[0];
-	
-	
 	cout<<"-------------第一個最大出現拉-----------這裡是分界線------------------------------------------"<<endl; 
-	
-//	printInOrder();
-////	inOrder(MaxNode);
-//	
-//	
-	if(MaxNode.left.nextNode!=""){
+	if(MaxNode.left.nextNode!=""){   
 		goalArray[1]="";
 	}
 	if(MaxNode.middle.nextNode!=""){
@@ -409,16 +428,6 @@ int main() {
 		goalArray[3]="";
 	}
 	GO(goalArray,MaxNode.col);  //成功!!!!!!!!!!!!!!!! 
-//	data2=make_goal_data(goalArray[1],MaxNode.col);  //要改 	
-//	MaxNode2=findMaxGain(data2);	
-//	createTreeNode(MaxNode2); //建樹 
-//	cout<<"-------------338&339都對啦-----------這裡是分界線------------------------------------------"<<endl; 
-//	Data_Str data3; 
-//	data3=make_goal_data(goalArray[3],MaxNode.col);  //要改 
-//	MaxNode=findMaxGain(data3);	
-//	cout<<"-------------第二步做出來啦-----------這裡是分界線------------------------------------------"<<endl;    
-//
-//	
-	
+	inOrder(head);
 	return 0;
 }
