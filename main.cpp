@@ -48,13 +48,18 @@ int isTreeEmpty() {
 }
 //---------輸入決策樹-----------
 void createTreeNode(DecisionTree TreeNode,string goalStr){
+	
 	DTree newNode, current ,YES ,NO;
-	DecisionTree yes,no;
+	cout<<TreeNode.NodeData<<endl;
+	cout<<TreeNode.middle.nextNode<<endl;
+	YES= new NODE; 
 	YES->data.NodeData="Yes";
+	NO= new NODE; 
 	NO->data.NodeData="No";
 	int inserted=0; // 是否加入新的節點 
 	newNode= new NODE; 
 	newNode->data=TreeNode;
+	cout<<TreeNode.NodeData<<endl;
 	if(TreeNode.left.nextNode=="Yes"){
 		newNode->LeftNode=YES;
 	}else if(TreeNode.left.nextNode=="No"){
@@ -76,28 +81,45 @@ void createTreeNode(DecisionTree TreeNode,string goalStr){
 	}else{
 		newNode->RightNode=new NODE;
 	}
+	cout<<"newNode->data.NodeData，"<<newNode->data.NodeData<<endl;
+	cout<<"newNode->LeftNode->data.NodeData，"<<newNode->LeftNode->data.NodeData<<endl;
+	cout<<"newNode->MiddleNode->data.NodeData，"<<newNode->MiddleNode->data.NodeData<<endl;
+	cout<<"newNode->RightNode->data.NodeData，"<<newNode->RightNode->data.NodeData<<endl;
 //	cout<<newNode->data.middle.nextNode<<endl;
 	if(isTreeEmpty()){ 
 		head=newNode; // 建立根節點 
 	}else{
 		current=head;
-		if(newNode->LeftNode->data.NodeData==""){
-			if(current->LeftNode->data.left.goalString==goalStr){
-				current->LeftNode=newNode; // 建立連結 
-			}
-		}else if(newNode->MiddleNode->data.NodeData==""){
-			if(current->MiddleNode->data.middle.goalString==goalStr){
-				current->MiddleNode=newNode;
-			}
-		}else if(newNode->RightNode->data.NodeData=="")
-			if(current->RightNode->data.right.goalString==goalStr){
-			current->RightNode=newNode;
+		while(!inserted){
+			if(current->LeftNode->data.NodeData==""){
+				if(current->data.left.goalString==goalStr){
+					current->LeftNode=newNode; // 建立連結 
+					inserted=1;
+				}else{
+					current=current->LeftNode;
+				}
+			}else if(current->MiddleNode->data.NodeData==""){
+				if(current->data.middle.goalString==goalStr){
+					current->MiddleNode=newNode;
+					inserted=1;
+				}else{
+					current=current->MiddleNode;
+				}
+			}else if(current->RightNode->data.NodeData==""){
+				if(current->data.right.goalString==goalStr){
+					current->RightNode=newNode;
+					inserted=1;
+				}else{
+					current=current->RightNode;
+				}			
+			}			
 		}
 	}
-	cout<<head->data.NodeData<<endl;
-	cout<<head->LeftNode->data.NodeData<<endl;
-	cout<<head->MiddleNode->data.NodeData<<endl;
-	cout<<head->RightNode->data.NodeData<<endl;
+	cout<<"head->data.NodeData，"<<head->data.NodeData<<endl;
+	cout<<"head->LeftNode->data.NodeData，"<<head->LeftNode->data.NodeData<<endl;
+	
+	cout<<"head->MiddleNode->data.NodeData，"<<head->MiddleNode->data.NodeData<<endl;
+	cout<<"head->RightNode->data.NodeData，"<<head->RightNode->data.NodeData<<endl;
 }
 //----------讀檔----------
 void readData(string **data, int r, int c){
@@ -349,8 +371,8 @@ void GO(string *goalArray,int MAX_Col){
 		if(goalArray[i]!=""){
 			Data_Str data=make_goal_data(goalArray[i],MAX_Col);  //根據SUNNY製作DATA 
 			MaxNode=findMaxGain(data); //在SUNNY的資料裡找最大    跟著畫一次決策樹 
-			
-			createTreeNode(MaxNode,goalArray[i]); //建樹 			
+			createTreeNode(MaxNode,goalArray[i]); //建樹 
+						
 		}
 
 	}
@@ -364,13 +386,19 @@ int main() {
 	DecisionTree MaxNode,MaxNode2;
 	data.Data=createBaseData(data.D_row,data.D_col);
 	MaxNode=findMaxGain(data);
-	
 	cout<<MaxNode.middle.nextNode<<endl;
+	cout<<MaxNode.middle.goalString<<endl;
+	createTreeNode(MaxNode,MaxNode.middle.goalString); //建樹 
+	string *goalArray=returnGoalArray(MaxNode.col); // 找最大欄的字串串列 
+//	string Node=goalArray[0];
+	
+	
 	cout<<"-------------第一個最大出現拉-----------這裡是分界線------------------------------------------"<<endl; 
-//	createTreeNode(MaxNode); //建樹 
+	
 //	printInOrder();
 ////	inOrder(MaxNode);
-	string *goalArray=returnGoalArray(MaxNode.col); // 找最大欄的字串串列 
+//	
+//	
 	if(MaxNode.left.nextNode!=""){
 		goalArray[1]="";
 	}
