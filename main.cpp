@@ -46,34 +46,38 @@ int isTreeEmpty() {
 	if(head==NULL) return 1;
 	else           return 0;
 }
+
 //---------輸入決策樹-----------
 void createTreeNode(DecisionTree TreeNode,string goalStr){
-	
 	DTree newNode, current ,YES ,NO;
-	cout<<TreeNode.NodeData<<endl;
-	cout<<TreeNode.middle.nextNode<<endl;
 	YES= new NODE; 
 	YES->data.NodeData="Yes";
+	YES->LeftNode=new NODE;
+	YES->MiddleNode=new NODE;
+	YES->RightNode=new NODE;
 	NO= new NODE; 
 	NO->data.NodeData="No";
+	NO->LeftNode=new NODE;
+	NO->MiddleNode=new NODE;
+	NO->RightNode=new NODE;
 	int inserted=0; // 是否加入新的節點 
 	newNode= new NODE; 
-	newNode->data=TreeNode;
-	cout<<TreeNode.NodeData<<endl;
+	newNode->data=TreeNode; 
+	newNode->LeftNode=new NODE;
+	newNode->MiddleNode=new NODE;
+	newNode->RightNode=new NODE;
 	if(TreeNode.left.nextNode=="Yes"){
 		newNode->LeftNode=YES;
 	}else if(TreeNode.left.nextNode=="No"){
 		newNode->LeftNode=NO;
 	}else{
-		newNode->LeftNode=new NODE;
 		newNode->LeftNode->data.NodeData="";
 	}
 	if(TreeNode.middle.nextNode=="Yes"){
 		newNode->MiddleNode=YES;
 	}else if(TreeNode.middle.nextNode=="No"){
 		newNode->MiddleNode=NO;
-	}else{
-		newNode->MiddleNode=new NODE;
+	}else{	
 		newNode->MiddleNode->data.NodeData="";
 	}
 	if(TreeNode.right.nextNode=="Yes"){
@@ -81,7 +85,6 @@ void createTreeNode(DecisionTree TreeNode,string goalStr){
 	}else if(TreeNode.right.nextNode=="No"){
 		newNode->RightNode=NO;
 	}else{
-		newNode->RightNode=new NODE;
 		newNode->RightNode->data.NodeData="";
 	}
 	cout<<"newNode->data.NodeData，"<<newNode->data.NodeData<<endl;
@@ -89,7 +92,7 @@ void createTreeNode(DecisionTree TreeNode,string goalStr){
 	cout<<"newNode->MiddleNode->data.NodeData，"<<newNode->MiddleNode->data.NodeData<<endl;
 	cout<<"newNode->RightNode->data.NodeData，"<<newNode->RightNode->data.NodeData<<endl;
 //	cout<<newNode->data.middle.nextNode<<endl;
-	if(isTreeEmpty()){ 
+	if(isTreeEmpty()){  //return 1 =NULL ； 0=有 
 		head=newNode; // 建立根節點 
 	}else{
 		current=head;
@@ -120,7 +123,6 @@ void createTreeNode(DecisionTree TreeNode,string goalStr){
 	}
 	cout<<"head->data.NodeData，"<<head->data.NodeData<<endl;
 	cout<<"head->LeftNode->data.NodeData，"<<head->LeftNode->data.NodeData<<endl;
-	
 	cout<<"head->MiddleNode->data.NodeData，"<<head->MiddleNode->data.NodeData<<endl;
 	cout<<"head->RightNode->data.NodeData，"<<head->RightNode->data.NodeData<<endl;
 }
@@ -131,13 +133,11 @@ void readData(string **data, int r, int c){
 	int col;
 	for(row=0;row<r;row++){
 		string line;
-		if(!getline(file,line)){  //從輸入流讀入一行到string變量，直到沒有0讀入字符、返回false
+		if(!getline(file,line))  //從輸入流讀入一行到string變量，直到沒有0讀入字符、返回false
 			break;
-		}
 		stringstream iss(line);  //將一個字符串string變量line的值轉成istringstream類別iss
-		if(!iss.good()){  //如果沒錯就回傳True
+		if(!iss.good())  //如果沒錯就回傳True
 			break;
-		}
 		for(col=0;col<c;col++){
 			string val;
 			getline(iss,val,',');  //字串分割
@@ -150,9 +150,8 @@ void readData(string **data, int r, int c){
 string** createBaseData(int data_row,int data_col){
 	string **data=NULL; //宣告矩陣
 	data=new string *[data_row]; //建立有data_row個string的陣列位址
-	for(int i=0;i<data_row;i++){
+	for(int i=0;i<data_row;i++)
 		data[i]=new string[data_col]; // 每條陣列位址內再加data_col個string的陣列位址
-	}
 	readData(data,data_row,data_col);
 	return data;
 }
@@ -223,8 +222,6 @@ struct goalData find_yes_no(Data_Str data,int c,struct goalData str){
 			}
 		}
 	}
-	int dif=str.goalYES-str.goalNO;
-	cout<<"int dif=str.goalYES-str.goalNO;int dif=str.goalYES-str.goalNO;，，，"<<dif<<endl;
 	if(str.goalYES==0){ //如果yes完全沒有 
 		str.nextNode="No"; //令下一個節點為no 
 		str.goalE=0.0;  //熵設為0 
@@ -232,7 +229,6 @@ struct goalData find_yes_no(Data_Str data,int c,struct goalData str){
 		str.nextNode="Yes";
 		str.goalE=0.0;
 	}
-	
 	else{
 		str.goalE=Entropy_function(str.goalYES,str.goalNO);
 	}
@@ -365,10 +361,9 @@ void inOrder(DTree ptr){
         cout<<ptr->data.NodeData<<endl;
     else 
     	return;
-        inOrder(ptr->LeftNode);
-        inOrder(ptr->MiddleNode);
-        inOrder(ptr->RightNode);
-    
+    inOrder(ptr->LeftNode);
+    inOrder(ptr->MiddleNode);
+    inOrder(ptr->RightNode);
 }
 
 void GO(string *goalArray,int MAX_Col){
