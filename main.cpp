@@ -25,13 +25,13 @@ typedef struct Node{
 	struct goalData middle; // 中屬性 
 	struct goalData right;  // 右屬性 
 	double NodeE;  // 整個欄位屬性的 熵 
-	double Gain;  //   
+	double Gain;  // 資訊獲利  
 }DecisionTree;
 typedef struct TNode{
-	DecisionTree data;
-	struct TNode *LeftNode;
-	struct TNode *MiddleNode;
-	struct TNode *RightNode;
+	DecisionTree data;  // 樹儲存的內容
+	struct TNode *LeftNode;  // 左指標
+	struct TNode *MiddleNode;  // 中指標
+	struct TNode *RightNode;  // 右指標
 }NODE;
 typedef NODE *DTree;
 DTree head=NULL; // 令一開始的根結點為空 
