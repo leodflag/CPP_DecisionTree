@@ -80,6 +80,10 @@ void createTreeNode(DecisionTree TreeNode,string goalStr){
 	}else{
 		newNode->RightNode->data.NodeData="";
 	}
+	cout<<"newNode->data.NodeData，"<<newNode->data.NodeData<<endl;
+	cout<<"newNode->LeftNode->data.NodeData，"<<newNode->LeftNode->data.NodeData<<endl;
+	cout<<"newNode->MiddleNode->data.NodeData，"<<newNode->MiddleNode->data.NodeData<<endl;
+	cout<<"newNode->RightNode->data.NodeData，"<<newNode->RightNode->data.NodeData<<endl;
 	if(isTreeEmpty()){  //return 1 =NULL ； 0=樹存在 
 		head=newNode; // 建立根節點 
 	}else{
@@ -109,6 +113,10 @@ void createTreeNode(DecisionTree TreeNode,string goalStr){
 			}			
 		}
 	}
+	cout<<"head->data.NodeData，"<<head->data.NodeData<<endl;
+	cout<<"head->LeftNode->data.NodeData，"<<head->LeftNode->data.NodeData<<endl;
+	cout<<"head->MiddleNode->data.NodeData，"<<head->MiddleNode->data.NodeData<<endl;
+	cout<<"head->RightNode->data.NodeData，"<<head->RightNode->data.NodeData<<endl;
 }
 //----------讀檔----------
 void readData(string **data, int r, int c){
@@ -159,8 +167,9 @@ string* returnGoalArray(int c){ // c為特定欄位
 	string *goalDArray=new string[4] ; // 建立 goalData的陣列
 	for(int row=0;row<row_len;row++){
 		goalDArray[row]=data[row][c]; // 矩陣成員
+		cout<<"goalDArray[row]"<<goalDArray[row]<<endl;
 	}
-	return goalDArray;	
+	return goalDArray;
 }
 //----------熵計算----------
 double Entropy_function(int YES,int NO){//一個目標字串的熵
@@ -171,7 +180,9 @@ double Entropy_function(int YES,int NO){//一個目標字串的熵
 	double no;
 	yes=((double)YES/sum);
 	no=((double)NO/sum);
+//	printf("Y==%f,N==%f,sum=%d\n",yes,no,sum);
 	entropy=-(yes*log2(yes))-(no*log2(no));
+//	printf("entropy==%f\n",entropy); //一個目標字串的熵
 	return entropy;
 }
 //---------每行每列對應的Y/NO-----------  
@@ -179,14 +190,20 @@ struct goalData find_yes_no(Data_Str data,int c,struct goalData str){
 	str.goalYES=0;
 	str.goalNO=0;
 	int goalrow[10],i=0;
+//	cout<<"str="<<str.goalString<<endl;
 	for(int row=0;row<data.D_row;row++){
+//		cout<<"data[row][c]="<<data[row][c]<<endl;
 		if(str.goalString==data.Data[row][c]){ // 若目標字串==資料表內的字串 
 			goalrow[i]=row;
+			cout<<"goalrow[i]"<<i<<"，"<<goalrow[i]<<endl;
 			i++;
+//			cout<<str.goalString<<endl;
 			if(data.Data[row][5]=="Yes"){  //找出同橫列的Y/N 
 				str.goalYES+=1;
+//				cout<<"Y=="<<str.goalYES<<endl;
 			}else{
 				str.goalNO+=1;
+//				cout<<"N=="<<str.goalNO<<endl;
 			}
 		}
 	}
@@ -218,8 +235,14 @@ Data_Str make_goal_data(string GoalStr,int c){  //小表 ：目標字，所在欄位    OKK
 				--r;
 		}
 	}
+	// 印出小表、確認是否正確 
 	Data.D_row=data_row;
 	Data.D_col=data_col;
+	for(int j=0;j<Data.D_row;j++){
+		for(int i=0;i<Data.D_col;i++){
+			cout<<"make_goal_data，"<<Data.Data[i][j]<<endl;
+		}
+	}
 	return Data;
 }
 //----------找尋目標欄位Gain值----------
@@ -234,18 +257,21 @@ DecisionTree findgoalS(Data_Str data,string *array,int c){ // 尋找不重複的，存入
 			TreeNode.left.goalString=array[r]; 	 // 左屬性) 
 			TreeNode.left=find_yes_no(data,c,TreeNode.left); // 找Y/N個數 
 			leftN=TreeNode.left.goalYES+TreeNode.left.goalNO; // 計算左屬性個數 
+			cout<<"leftN="<<leftN<<endl;
 			YesAll+=TreeNode.left.goalYES; // 計算表的全部YES 
 			NoAll+=TreeNode.left.goalNO;   // 計算表的全部NO 
 		}else if(r==2){
 			TreeNode.middle.goalString=array[r]; 	 // 中屬性
 			TreeNode.middle=find_yes_no(data,c,TreeNode.middle);
 			middleN=TreeNode.middle.goalYES+TreeNode.middle.goalNO;
+			cout<<"middleN="<<middleN<<endl;
 			YesAll+=TreeNode.middle.goalYES;
 			NoAll+=TreeNode.middle.goalNO;
 		}else if(r==3){
 			TreeNode.right.goalString=array[r]; 	 // 右屬性
 			TreeNode.right=find_yes_no(data,c,TreeNode.right);
 			rightN=TreeNode.right.goalYES+TreeNode.right.goalNO;
+			cout<<"rightN="<<rightN<<endl;
 			YesAll+=TreeNode.right.goalYES;
 			NoAll+=TreeNode.right.goalNO;
 		}else{
@@ -262,13 +288,24 @@ DecisionTree findgoalS(Data_Str data,string *array,int c){ // 尋找不重複的，存入
 	if(rightN==0){
 		TreeNode.right.nextNode="NULL";
 	}
+	printf("NOALL=%d\n",NoAll);
+	printf("YESALL=%d\n",YesAll);
 	//----------計算目標Gain值----------
 	All=YesAll+NoAll;
+	cout<<"ALL="<<All<<endl;
 	TreeNode.NodeE=Entropy_function(YesAll,NoAll); // 計算根節點的熵 
-	// 計算根節點的資訊獲利  
-	TreeNode.Gain=TreeNode.NodeE-(double)leftN/All*TreeNode.left.goalE\   
-								-(double)middleN/All*TreeNode.middle.goalE\
+	printf("ALL，TreeNode.NodeE=%f\n",TreeNode.NodeE);
+	cout<<"(double)leftN/All*TreeNode.left.goalE=="<<(double)leftN/All*TreeNode.left.goalE<<endl;
+	cout<<"(double)middleN/All*TreeNode.middle.goalE="<<(double)middleN/All*TreeNode.middle.goalE<<endl;
+	cout<<"(double)rightN/All*TreeNode.right.goalE="<<(double)rightN/All*TreeNode.right.goalE<<endl;
+	// 計算根節點的資訊獲利 
+	TreeNode.Gain=TreeNode.NodeE-(double)leftN/All*TreeNode.left.goalE \   
+								-(double)middleN/All*TreeNode.middle.goalE \
 								-(double)rightN/All*TreeNode.right.goalE;
+	printf("TreeNode.Gain=%f\n",TreeNode.Gain);
+	if(TreeNode.right.goalString==""){
+		cout<<"TreeNode.right.goalString===NULL"<<endl;
+	}
 	return TreeNode;
 }
 //-------------找尋最大Gain值-----------------
@@ -281,12 +318,21 @@ DecisionTree findMaxGain(Data_Str data){
 		goalsArray=returnGoalArray(i); //取得每行屬性 
 		goalNode=findgoalS(data,goalsArray,i); //找到所有屬性的資料 
 		Gain=goalNode.Gain; //取得根節點Gain值 
+		cout<<i<<"，Gain="<<Gain<<endl;
 		if(Gain>MaxGain){  //找最大Gain值的根節點 
 			goalNode.col=i;
 			MaxGain=Gain;
 			MaxNode=goalNode;
 		}
 	}
+	cout<<"MaxGain="<<MaxGain<<endl;
+	cout<<"MaxNode="<<MaxNode.NodeData<<endl;
+	cout<<"MaxNode.left.goalString="<<MaxNode.left.goalString<<endl;
+	cout<<"MaxNode.left.nextNode="<<MaxNode.left.nextNode<<endl;
+	cout<<"MaxNode.middle.goalString="<<MaxNode.middle.goalString<<endl;
+	cout<<"MaxNode.middle.nextNode="<<MaxNode.middle.nextNode<<endl;
+	cout<<"MaxNode.right.goalString="<<MaxNode.right.goalString<<endl;
+	cout<<"MaxNode.right.nextNode="<<MaxNode.right.nextNode<<endl;
 	return 	MaxNode;
 }
 void inOrder(DTree ptr){  // 中序走訪 
@@ -326,8 +372,11 @@ void GO(string *goalArray,int MAX_Col){
 				}				
 			}
 			createTreeNode(MaxNode,goalArray[i]); //建樹 
+						
 		}
+
 	}
+	
 }
 int main() {
 	Data_Str data,data2;
@@ -338,6 +387,7 @@ int main() {
 	MaxNode=findMaxGain(data); // 找到head樹的根節點 
 	createTreeNode(MaxNode,MaxNode.middle.goalString); // 建樹 
 	string *goalArray=returnGoalArray(MaxNode.col); // 找最大資訊獲利欄的字串串列 
+	cout<<"-------------第一個最大出現拉-----------這裡是分界線------------------------------------------"<<endl; 
 	if(MaxNode.left.nextNode!=""){   // 為了將overcast從製作小表時排除，已存yes 
 		goalArray[1]="";
 	}
