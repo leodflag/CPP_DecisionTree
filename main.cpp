@@ -2,168 +2,168 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <math.h>
 using namespace std;
-struct Data_Str{  //¬ö¿ı¤Gºû¯x°}ªø¼e 
+struct Data_Str{  //ç´€éŒ„äºŒç¶­çŸ©é™£é•·å¯¬ 
 	string **Data;
-	int D_row;  
+	int D_row;
 	int D_col;
 };
-struct goalData{  // ¥Ø¼ĞÄİ©Êªí³æ
-	string nextNode; // «ü¼Ğ¤U­Ó node !=NULL 
-	string goalString; // ¥Ø¼ĞÄİ©Ê 
-	int goalYES;  // ¥Ø¼ĞYes¼Æ¶q	 
-	int goalNO;	  // ¥Ø¼ĞNo¼Æ¶q 
-	double goalE; // ¥Ø¼Ğæi 
+struct goalData{  // ç›®æ¨™å±¬æ€§è¡¨å–®
+	string nextNode; // æŒ‡æ¨™ä¸‹å€‹ node !=NULL 
+	string goalString; // ç›®æ¨™å±¬æ€§ 
+	int goalYES;  // ç›®æ¨™Yesæ•¸é‡
+	int goalNO;	  // ç›®æ¨™Noæ•¸é‡ 
+	double goalE; // ç›®æ¨™ç†µ 
 };
 typedef struct Node{
-	int col;  // ¦æ¼Æ 
-	string NodeData;  // Äæ¦ì 
-	struct goalData left;  // ¥ªÄİ©Ê 
-	struct goalData middle; // ¤¤Äİ©Ê 
-	struct goalData right;  // ¥kÄİ©Ê 
-	double NodeE;  // ¾ã­ÓÄæ¦ìÄİ©Êªº æi 
-	double Gain;  // ¸ê°TÀò§Q  
+	int col;  // è³‡æ–™æ‰€åœ¨è¡Œæ•¸ 
+	string NodeData;  // è³‡æ–™æ¬„ä½åç¨±
+	struct goalData left;  // å·¦å…§éƒ¨å±¬æ€§ 
+	struct goalData middle; // ä¸­å…§éƒ¨å±¬æ€§
+	struct goalData right;  // å³å…§éƒ¨å±¬æ€§
+	double NodeE;  // æ•´å€‹æ¬„ä½å±¬æ€§çš„ ç†µ 
+	double Gain;  // è³‡è¨Šç²åˆ©
 }DecisionTree;
 typedef struct TNode{
-	DecisionTree data;  // ¾ğÀx¦sªº¤º®e
-	struct TNode *LeftNode;  // ¥ª«ü¼Ğ
-	struct TNode *MiddleNode;  // ¤¤«ü¼Ğ
-	struct TNode *RightNode;  // ¥k«ü¼Ğ
+	DecisionTree data;  // æ¨¹å„²å­˜çš„å…§å®¹
+	struct TNode *LeftNode;  // å·¦æŒ‡æ¨™
+	struct TNode *MiddleNode;  // ä¸­æŒ‡æ¨™
+	struct TNode *RightNode;  // å³æŒ‡æ¨™
 }NODE;
 typedef NODE *DTree;
-DTree head=NULL; // ¥O¤@¶}©lªº®Úµ²ÂI¬°ªÅ 
-//---------ÀË´ú¨Mµ¦¾ğ¬O§_¬OªÅªº-----------
+DTree head=NULL; // ä»¤ä¸€é–‹å§‹çš„æ ¹çµé»ç‚ºç©º 
+//---------æª¢æ¸¬æ±ºç­–æ¨¹æ˜¯å¦æ˜¯ç©ºçš„-----------
 int isTreeEmpty() {
 	if(head==NULL) return 1;
 	else           return 0;
 }
-//---------¿é¤J¨Mµ¦¾ğ-----------
+//---------è¼¸å…¥æ±ºç­–æ¨¹-----------
 void createTreeNode(DecisionTree TreeNode,string goalStr){
 	DTree newNode, current ,YES ,NO;
-	int inserted=0; // ¬O§_¥[¤J·sªº¸`ÂI 
-	YES= new NODE; //«Ø¥ßYES®Ú¸`ÂI°µ¸­¸`ÂI 
+	int inserted=0; // æ˜¯å¦åŠ å…¥æ–°çš„ç¯€é»
+	YES= new NODE; //å»ºç«‹YESæ ¹ç¯€é»åšè‘‰ç¯€é»
 	YES->data.NodeData="Yes";
 	YES->LeftNode=new NODE;
 	YES->MiddleNode=new NODE;
 	YES->RightNode=new NODE;
-	NO= new NODE; //«Ø¥ßNO®Ú¸`ÂI°µ¸­¸`ÂI 
+	NO= new NODE; //å»ºç«‹NOæ ¹ç¯€é»åšè‘‰ç¯€é»
 	NO->data.NodeData="No";
 	NO->LeftNode=new NODE;
 	NO->MiddleNode=new NODE;
 	NO->RightNode=new NODE;
-	newNode= new NODE; 
-	newNode->data=TreeNode; //«Ø¥ß·sªº®Ú¸`ÂI°µ¸­¸`ÂI 
+	newNode= new NODE;
+	newNode->data=TreeNode; //å»ºç«‹æ–°çš„æ ¹ç¯€é»åšè‘‰ç¯€é»
 	newNode->LeftNode=new NODE;
 	newNode->MiddleNode=new NODE;
 	newNode->RightNode=new NODE;
-	if(TreeNode.left.nextNode=="Yes"){  // TreeNodeªº¥ª¤l¾ğ­Y¤U­Ó«ü¦V¸`ÂI¬°Yes 
-		newNode->LeftNode=YES;   // ·s¸`ÂIªº¥ª«ü¼Ğ«ü¦VYES 
-	}else if(TreeNode.left.nextNode=="No"){ // TreeNodeªº¥k¤l¾ğ­Y¤U­Ó«ü¦V¸`ÂI¬°NO 
-		newNode->LeftNode=NO;	 // ·s¸`ÂIªº¥ª«ü¼Ğ«ü¦VNO 
+	if(TreeNode.left.nextNode=="Yes"){  // TreeNodeçš„å·¦å­æ¨¹è‹¥ä¸‹å€‹æŒ‡å‘ç¯€é»ç‚ºYes 
+		newNode->LeftNode=YES;   // æ–°ç¯€é»çš„å·¦æŒ‡æ¨™æŒ‡å‘YES
+	}else if(TreeNode.left.nextNode=="No"){ // TreeNodeçš„å³å­æ¨¹è‹¥ä¸‹å€‹æŒ‡å‘ç¯€é»ç‚ºNO
+		newNode->LeftNode=NO;	 // æ–°ç¯€é»çš„å·¦æŒ‡æ¨™æŒ‡å‘NO
 	}else{
-		newNode->LeftNode->data.NodeData="";  // ¥O·s¸`ÂIªº¥ª«ü¼Ğ«ü¦Vªº®Ú¸ê®Æ¬°ªÅ 
+		newNode->LeftNode->data.NodeData="";  // ä»¤æ–°ç¯€é»çš„å·¦æŒ‡æ¨™æŒ‡å‘çš„æ ¹è³‡æ–™ç‚ºç©º 
 	}
-	if(TreeNode.middle.nextNode=="Yes"){  //  ¤¤¤l¾ğ 
+	if(TreeNode.middle.nextNode=="Yes"){  //  ä¸­å­æ¨¹ 
 		newNode->MiddleNode=YES;
 	}else if(TreeNode.middle.nextNode=="No"){
 		newNode->MiddleNode=NO;
-	}else{	
+	}else{
 		newNode->MiddleNode->data.NodeData="";
 	}
-	if(TreeNode.right.nextNode=="Yes"){ //¥k¤l¾ğ 
+	if(TreeNode.right.nextNode=="Yes"){ //å³å­æ¨¹ 
 		newNode->RightNode=YES;
 	}else if(TreeNode.right.nextNode=="No"){
 		newNode->RightNode=NO;
 	}else{
 		newNode->RightNode->data.NodeData="";
 	}
-	if(isTreeEmpty()){  //return 1 =NULL ¡F 0=¾ğ¦s¦b 
-		head=newNode; // «Ø¥ß®Ú¸`ÂI 
+	if(isTreeEmpty()){  //return 1 =NULL ï¼› 0=æ¨¹å­˜åœ¨
+		head=newNode; // å»ºç«‹æ ¹ç¯€é»
 	}else{
-		current=head;  //¥O·í«e«ü¼Ğ«ü¦Vhead 
-		while(!inserted){  //­Y·s¸`ÂI¥¼¥[¤J 
-			if(current->LeftNode->data.NodeData==""){  //¦pªG·í«e¸`ÂIªº¥ª¸`ÂI«ü¦Vªº®Ú¸ê®Æ¬°ªÅ 
-				if(current->data.left.goalString==goalStr){ //¦pªG·í«e¸`ÂI«ü¦Vªº¸ê®Æ¤º¥ªÄİ©Êªº¥Ø¼ĞÄİ©Ê¸ò¿é¤JªºÄİ©Ê¤@¼Ë 
-					current->LeftNode=newNode; // «Ø¥ß³sµ² 
+		current=head;  //ä»¤ç•¶å‰æŒ‡æ¨™æŒ‡å‘head
+		while(!inserted){  //è‹¥æ–°ç¯€é»æœªåŠ å…¥
+			if(current->LeftNode->data.NodeData==""){  //å¦‚æœç•¶å‰ç¯€é»çš„å·¦ç¯€é»æŒ‡å‘çš„æ ¹è³‡æ–™ç‚ºç©º 
+				if(current->data.left.goalString==goalStr){ //å¦‚æœç•¶å‰ç¯€é»æŒ‡å‘çš„è³‡æ–™å…§å·¦å±¬æ€§çš„ç›®æ¨™å±¬æ€§è·Ÿè¼¸å…¥çš„å±¬æ€§ä¸€æ¨£ 
+					current->LeftNode=newNode; // å»ºç«‹é€£çµ
 					inserted=1;
 				}else{
-					current=current->LeftNode; // ¥O¥ª«ü¦Vªº¸`ÂI¬°·í«e¸`ÂI¡AÄ~Äò¥ª¨« 
+					current=current->LeftNode; // ä»¤å·¦æŒ‡å‘çš„ç¯€é»ç‚ºç•¶å‰ç¯€é»ï¼Œç¹¼çºŒå·¦èµ° 
 				}
-			}else if(current->MiddleNode->data.NodeData==""){  //·í«e¸`ÂIªº¤¤¸`ÂI 
+			}else if(current->MiddleNode->data.NodeData==""){  //ç•¶å‰ç¯€é»çš„ä¸­ç¯€é» 
 				if(current->data.middle.goalString==goalStr){
 					current->MiddleNode=newNode;
 					inserted=1;
 				}else{
 					current=current->MiddleNode;
 				}
-			}else if(current->RightNode->data.NodeData==""){  //·í«e¸`ÂIªº¥k¸`ÂI  
+			}else if(current->RightNode->data.NodeData==""){  //ç•¶å‰ç¯€é»çš„å³ç¯€é»
 				if(current->data.right.goalString==goalStr){
 					current->RightNode=newNode;
 					inserted=1;
 				}else{
 					current=current->RightNode;
-				}			
-			}			
+				}
+			}
 		}
 	}
 }
-//----------ÅªÀÉ----------
+//----------è®€æª”----------
 void readData(string **data, int r, int c){
-	ifstream file("data_tree.csv"); //Åª¤JÀÉ®× 
+	ifstream file("data_tree.csv"); //è®€å…¥æª”æ¡ˆ 
 	int row;
 	int col;
 	for(row=0;row<r;row++){
 		string line;
-		if(!getline(file,line))  //±q¿é¤J¬yÅª¤J¤@¦æ¨ìstringÅÜ¶q¡Aª½¨ì¨S¦³0Åª¤J¦r²Å¡Bªğ¦^false
+		if(!getline(file,line))  //å¾è¼¸å…¥æµè®€å…¥ä¸€è¡Œåˆ°stringè®Šé‡ï¼Œç›´åˆ°æ²’æœ‰0è®€å…¥å­—ç¬¦ã€è¿”å›false
 			break;
-		stringstream iss(line);  //±N¤@­Ó¦r²Å¦êstringÅÜ¶qlineªº­ÈÂà¦¨istringstreamÃş§Oiss
-		if(!iss.good())  //¦pªG¨S¿ù´N¦^¶ÇTrue
+		stringstream iss(line);  //å°‡ä¸€å€‹å­—ç¬¦ä¸²stringè®Šé‡lineçš„å€¼è½‰æˆistringstreamé¡åˆ¥iss
+		if(!iss.good())  //å¦‚æœæ²’éŒ¯å°±å›å‚³True
 			break;
 		for(col=0;col<c;col++){
 			string val;
-			getline(iss,val,',');  //¦r¦ê¤À³Î
-			stringstream stringConvertorStringstream(val);  //±N¤@­Ó¦r²Å¦êÅÜ¶qªº­È¶Ç»¼µ¹istringstream¹ï¶H
-			stringConvertorStringstream>>data[row][col];  //¿é¤J¨ì¯x°}
+			getline(iss,val,',');  //å­—ä¸²åˆ†å‰²
+			stringstream stringConvertorStringstream(val);  //å°‡ä¸€å€‹å­—ç¬¦ä¸²è®Šé‡çš„å€¼å‚³éçµ¦istringstreamå°è±¡
+			stringConvertorStringstream>>data[row][col];  //è¼¸å…¥åˆ°çŸ©é™£
 		}
 	}
 } 
-//----------«Ø¥ß­ì©l¸ê®Æ----------
+//----------å»ºç«‹åŸå§‹è³‡æ–™----------
 string** createBaseData(int data_row,int data_col){
-	string **data=NULL; //«Å§i¯x°}
-	data=new string *[data_row]; //«Ø¥ß¦³data_row­Óstringªº°}¦C¦ì§}
+	string **data=NULL; //å®£å‘ŠçŸ©é™£
+	data=new string *[data_row]; //å»ºç«‹æœ‰data_rowå€‹stringçš„é™£åˆ—ä½å€
 	for(int i=0;i<data_row;i++)
-		data[i]=new string[data_col]; // ¨C±ø°}¦C¦ì§}¤º¦A¥[data_col­Óstringªº°}¦C¦ì§}
+		data[i]=new string[data_col]; // æ¯æ¢é™£åˆ—ä½å€å…§å†åŠ data_colå€‹stringçš„é™£åˆ—ä½å€
 	readData(data,data_row,data_col);
 	return data;
 }
-//---------¨ú±o¥Ø¼Ğª½¦æªº¦r¦ê°}¦C-----------
-string* returnGoalArray(int c){ // c¬°¯S©wÄæ¦ì 
+//---------å–å¾—ç›®æ¨™ç›´è¡Œçš„å­—ä¸²é™£åˆ—-----------
+string* returnGoalArray(int c){ // cç‚ºç‰¹å®šæ¬„ä½ 
 	int row_len=15,col_len=6;
 	string **data=createBaseData(row_len,col_len);
-	//----------§ä´Mª½¦æ¤ºªº¤£­«½ÆÄİ©Ê----------
+	//----------æ‰¾å°‹ç›´è¡Œå…§çš„ä¸é‡è¤‡å±¬æ€§----------
 	for(int i=0;i<row_len;i++){
  		for(int j=i+1;j<row_len;j++){
- 			if(data[i][c]==data[j][c]){  //­Y²Ä¤G­Ó¾î±Æ¸ò²Ä¤@­Ó¾î±Æ¤@¼Ë 
+ 			if(data[i][c]==data[j][c]){  //è‹¥ç¬¬äºŒå€‹æ©«æ’è·Ÿç¬¬ä¸€å€‹æ©«æ’ä¸€æ¨£ 
  				for(int k=j+1;k<row_len;k++){
- 					data[k-1][c]=data[k][c]; //±N²Ä¤T­Ó¾î±Æ©¹«e©ñ¨ì²Ä¤G­Ó¾î±Æ 
+ 					data[k-1][c]=data[k][c]; //å°‡ç¬¬ä¸‰å€‹æ©«æ’å¾€å‰æ”¾åˆ°ç¬¬äºŒå€‹æ©«æ’ 
 				}
-				--row_len; //¦æ±Æ¼Æ¶q´î1 
+				--row_len; //è¡Œæ’æ•¸é‡æ¸›1 
 				--j;
 			}
 		}
 	}
-	//---------±N§ä¨ìªºÄİ©Ê§@¦¨°}¦C-----------
-	string *goalDArray=new string[4] ; // «Ø¥ß goalDataªº°}¦C
+	//---------å°‡æ‰¾åˆ°çš„å±¬æ€§ä½œæˆé™£åˆ—-----------
+	string *goalDArray=new string[4] ; // å»ºç«‹ goalDataçš„é™£åˆ—
 	for(int row=0;row<row_len;row++){
-		goalDArray[row]=data[row][c]; // ¯x°}¦¨­û
+		goalDArray[row]=data[row][c]; // çŸ©é™£æˆå“¡
 	}
-	return goalDArray;	
+	return goalDArray;
 }
-//----------æi­pºâ----------
-double Entropy_function(int YES,int NO){//¤@­Ó¥Ø¼Ğ¦r¦êªºæi
+//----------ç†µè¨ˆç®—----------
+double Entropy_function(int YES,int NO){//ä¸€å€‹ç›®æ¨™å­—ä¸²çš„ç†µ
 	double entropy;
 	int sum;
 	sum=YES+NO;
@@ -174,25 +174,25 @@ double Entropy_function(int YES,int NO){//¤@­Ó¥Ø¼Ğ¦r¦êªºæi
 	entropy=-(yes*log2(yes))-(no*log2(no));
 	return entropy;
 }
-//---------¨C¦æ¨C¦C¹ïÀ³ªºY/NO-----------  
+//---------æ¯è¡Œæ¯åˆ—å°æ‡‰çš„Y/NO-----------  
 struct goalData find_yes_no(Data_Str data,int c,struct goalData str){
 	str.goalYES=0;
 	str.goalNO=0;
 	int goalrow[10],i=0;
 	for(int row=0;row<data.D_row;row++){
-		if(str.goalString==data.Data[row][c]){ // ­Y¥Ø¼Ğ¦r¦ê==¸ê®Æªí¤ºªº¦r¦ê 
+		if(str.goalString==data.Data[row][c]){ // è‹¥ç›®æ¨™å­—ä¸²==è³‡æ–™è¡¨å…§çš„å­—ä¸² 
 			goalrow[i]=row;
 			i++;
-			if(data.Data[row][5]=="Yes"){  //§ä¥X¦P¾î¦CªºY/N 
+			if(data.Data[row][5]=="Yes"){  //æ‰¾å‡ºåŒæ©«åˆ—çš„Y/N 
 				str.goalYES+=1;
 			}else{
 				str.goalNO+=1;
 			}
 		}
 	}
-	if(str.goalYES==0){ //¦pªGyes§¹¥ş¨S¦³ 
-		str.nextNode="No"; //¥O¤U¤@­Ó¸`ÂI¬°no 
-		str.goalE=0.0;  //æi³]¬°0 
+	if(str.goalYES==0){ //å¦‚æœyeså®Œå…¨æ²’æœ‰ 
+		str.nextNode="No"; //ä»¤ä¸‹ä¸€å€‹ç¯€é»ç‚ºno 
+		str.goalE=0.0;  //ç†µè¨­ç‚º0 
 	}else if(str.goalNO==0){
 		str.nextNode="Yes";
 		str.goalE=0.0;
@@ -202,16 +202,16 @@ struct goalData find_yes_no(Data_Str data,int c,struct goalData str){
 	}
 	return str;
 }
-Data_Str make_goal_data(string GoalStr,int c){  //¤pªí ¡G¥Ø¼Ğ¦r¡A©Ò¦bÄæ¦ì    OKKKKKKKKKKKKKKKKKKKKK
+Data_Str make_goal_data(string GoalStr,int c){  //å°è¡¨ ï¼šç›®æ¨™å­—ï¼Œæ‰€åœ¨æ¬„ä½
 	int data_row=15;
 	int data_col=6;
-	Data_Str Data; 
-	Data.Data=createBaseData(data_row,data_col);  // °µ¤jªí 
-	for(int r=1;r<data_row;r++){ // ±±¨î²Ä¤@¾î¦æ 
-		if(Data.Data[r][c]!=GoalStr){ // ­Y¤£µ¥©ó¥Ø¼Ğ 
-			for(int j=r+1;j<data_row;j++){  // ²Ä¤G¾î¦æ	
-				for(int col=0;col<data_col;col++){  // ¨ú¤U­Ó¾î¦C 
-					Data.Data[j-1][col]=Data.Data[j][col];  //  ©ñ¦^«e¾î¦C 
+	Data_Str Data;
+	Data.Data=createBaseData(data_row,data_col);  // åšå¤§è¡¨ 
+	for(int r=1;r<data_row;r++){ // æ§åˆ¶ç¬¬ä¸€æ©«è¡Œ 
+		if(Data.Data[r][c]!=GoalStr){ // è‹¥ä¸ç­‰æ–¼ç›®æ¨™
+			for(int j=r+1;j<data_row;j++){  // ç¬¬äºŒæ©«è¡Œ
+				for(int col=0;col<data_col;col++){  // å–ä¸‹å€‹æ©«åˆ— 
+					Data.Data[j-1][col]=Data.Data[j][col];  //  æ”¾å›å‰æ©«åˆ— 
 				}
 			}
 				--data_row;
@@ -222,28 +222,28 @@ Data_Str make_goal_data(string GoalStr,int c){  //¤pªí ¡G¥Ø¼Ğ¦r¡A©Ò¦bÄæ¦ì    OKK
 	Data.D_col=data_col;
 	return Data;
 }
-//----------§ä´M¥Ø¼ĞÄæ¦ìGain­È----------
-DecisionTree findgoalS(Data_Str data,string *array,int c){ // ´M§ä¤£­«½Æªº¡A¦s¤Jstruct goalData¡A¦^¶Ç¦r¦ê°}¦C
-	//---------­pºâ¦æ¤º¤£¦PÄİ©ÊªºY/N­Ó¼Æ-----------
+//----------æ‰¾å°‹ç›®æ¨™æ¬„ä½Gainå€¼----------
+DecisionTree findgoalS(Data_Str data,string *array,int c){ // å°‹æ‰¾ä¸é‡è¤‡çš„ï¼Œå­˜å…¥struct goalDataï¼Œå›å‚³å­—ä¸²é™£åˆ—
+	//---------è¨ˆç®—è¡Œå…§ä¸åŒå±¬æ€§çš„Y/Nå€‹æ•¸-----------
 	DecisionTree TreeNode;
 	int YesAll=0, NoAll=0, All=0, leftN=0, middleN=0, rightN=0, r=0;
 	while(r!=4){
-		if(r==0){  // ¬°¤F±N®Ú¸`ÂI¸ê®Æ¡B¥ª¤¤¥kÄİ©Ê§ì¥X¨Ó 
-			TreeNode.NodeData=array[r]; 	// ²Ä¤@­Ó¦r¬OÄæ¦ì
+		if(r==0){  // ç‚ºäº†å°‡æ ¹ç¯€é»è³‡æ–™ã€å·¦ä¸­å³å±¬æ€§æŠ“å‡ºä¾† 
+			TreeNode.NodeData=array[r]; 	// ç¬¬ä¸€å€‹å­—æ˜¯æ¬„ä½
 		}else if(r==1){
-			TreeNode.left.goalString=array[r]; 	 // ¥ªÄİ©Ê) 
-			TreeNode.left=find_yes_no(data,c,TreeNode.left); // §äY/N­Ó¼Æ 
-			leftN=TreeNode.left.goalYES+TreeNode.left.goalNO; // ­pºâ¥ªÄİ©Ê­Ó¼Æ 
-			YesAll+=TreeNode.left.goalYES; // ­pºâªíªº¥ş³¡YES 
-			NoAll+=TreeNode.left.goalNO;   // ­pºâªíªº¥ş³¡NO 
+			TreeNode.left.goalString=array[r]; 	 // å·¦å±¬æ€§
+			TreeNode.left=find_yes_no(data,c,TreeNode.left); // æ‰¾Y/Nå€‹æ•¸ 
+			leftN=TreeNode.left.goalYES+TreeNode.left.goalNO; // è¨ˆç®—å·¦å±¬æ€§å€‹æ•¸ 
+			YesAll+=TreeNode.left.goalYES; // è¨ˆç®—è¡¨çš„å…¨éƒ¨YES
+			NoAll+=TreeNode.left.goalNO;   // è¨ˆç®—è¡¨çš„å…¨éƒ¨NO
 		}else if(r==2){
-			TreeNode.middle.goalString=array[r]; 	 // ¤¤Äİ©Ê
+			TreeNode.middle.goalString=array[r]; 	 // ä¸­å±¬æ€§
 			TreeNode.middle=find_yes_no(data,c,TreeNode.middle);
 			middleN=TreeNode.middle.goalYES+TreeNode.middle.goalNO;
 			YesAll+=TreeNode.middle.goalYES;
 			NoAll+=TreeNode.middle.goalNO;
 		}else if(r==3){
-			TreeNode.right.goalString=array[r]; 	 // ¥kÄİ©Ê
+			TreeNode.right.goalString=array[r]; 	 // å³å±¬æ€§
 			TreeNode.right=find_yes_no(data,c,TreeNode.right);
 			rightN=TreeNode.right.goalYES+TreeNode.right.goalNO;
 			YesAll+=TreeNode.right.goalYES;
@@ -253,8 +253,8 @@ DecisionTree findgoalS(Data_Str data,string *array,int c){ // ´M§ä¤£­«½Æªº¡A¦s¤J
 		}
 		r++;
 	}
-	if(leftN==0){ //­Y¥ªÄİ©Ê­Ó¼Æ¬°0 
-		TreeNode.left.nextNode="NULL"; // ¥ªÄİ©Êªº¤U­Ó«ü¦V¬°NULL 
+	if(leftN==0){ //è‹¥å·¦å±¬æ€§å€‹æ•¸ç‚º0 
+		TreeNode.left.nextNode="NULL"; // å·¦å±¬æ€§çš„ä¸‹å€‹æŒ‡å‘ç‚ºNULL 
 	}
 	if(middleN==0){
 		TreeNode.middle.nextNode="NULL";
@@ -262,26 +262,26 @@ DecisionTree findgoalS(Data_Str data,string *array,int c){ // ´M§ä¤£­«½Æªº¡A¦s¤J
 	if(rightN==0){
 		TreeNode.right.nextNode="NULL";
 	}
-	//----------­pºâ¥Ø¼ĞGain­È----------
+	//----------è¨ˆç®—ç›®æ¨™Gainå€¼----------
 	All=YesAll+NoAll;
-	TreeNode.NodeE=Entropy_function(YesAll,NoAll); // ­pºâ®Ú¸`ÂIªºæi 
-	// ­pºâ®Ú¸`ÂIªº¸ê°TÀò§Q  
-	TreeNode.Gain=TreeNode.NodeE-(double)leftN/All*TreeNode.left.goalE\   
-								-(double)middleN/All*TreeNode.middle.goalE\
-								-(double)rightN/All*TreeNode.right.goalE;
+	TreeNode.NodeE=Entropy_function(YesAll,NoAll); // è¨ˆç®—æ ¹ç¯€é»çš„ç†µ 
+	// è¨ˆç®—æ ¹ç¯€é»çš„è³‡è¨Šç²åˆ©  
+	TreeNode.Gain=TreeNode.NodeE - (double)leftN / All * TreeNode.left.goalE \
+								- (double)middleN / All * TreeNode.middle.goalE \
+								- (double)rightN / All * TreeNode.right.goalE;
 	return TreeNode;
 }
-//-------------§ä´M³Ì¤jGain­È-----------------
+//-------------æ‰¾å°‹æœ€å¤§Gainå€¼-----------------
 DecisionTree findMaxGain(Data_Str data){ 
 	DecisionTree goalNode,MaxNode;
-	string *goalsArray;   
+	string *goalsArray;
 	int i;
 	double MaxGain=0.0,Gain=0.0;
-	for(i=1;i<5;i++){  //1~4Äæ 
-		goalsArray=returnGoalArray(i); //¨ú±o¨C¦æÄİ©Ê 
-		goalNode=findgoalS(data,goalsArray,i); //§ä¨ì©Ò¦³Äİ©Êªº¸ê®Æ 
-		Gain=goalNode.Gain; //¨ú±o®Ú¸`ÂIGain­È 
-		if(Gain>MaxGain){  //§ä³Ì¤jGain­Èªº®Ú¸`ÂI 
+	for(i=1;i<5;i++){  //1~4æ¬„ 
+		goalsArray=returnGoalArray(i); //å–å¾—æ¯è¡Œå±¬æ€§ 
+		goalNode=findgoalS(data,goalsArray,i); //æ‰¾åˆ°æ‰€æœ‰å±¬æ€§çš„è³‡æ–™ 
+		Gain=goalNode.Gain; //å–å¾—æ ¹ç¯€é»Gainå€¼ 
+		if(Gain>MaxGain){  //æ‰¾æœ€å¤§Gainå€¼çš„æ ¹ç¯€é» 
 			goalNode.col=i;
 			MaxGain=Gain;
 			MaxNode=goalNode;
@@ -289,43 +289,43 @@ DecisionTree findMaxGain(Data_Str data){
 	}
 	return 	MaxNode;
 }
-void inOrder(DTree ptr){  // ¤¤§Ç¨«³X 
-    if(ptr->data.NodeData!="")  // °±¤î±ø¥ó ¡F­Y®Ú¸`ÂIªº¸ê®Æ¤£¬°ªÅ 
-        cout<<ptr->data.NodeData<<endl;  // ¦L¥X¨Ó 
+void inOrder(DTree ptr){  // ä¸­åºèµ°è¨ª 
+    if(ptr->data.NodeData!="")  // åœæ­¢æ¢ä»¶ ï¼›è‹¥æ ¹ç¯€é»çš„è³‡æ–™ä¸ç‚ºç©º 
+        cout<<ptr->data.NodeData<<endl;  // å°å‡ºä¾† 
     else 
     	return;
-    inOrder(ptr->LeftNode); //»¼°j¡G ¿é¤Jªº®É­Ô·|ÅÜ¦¨  ptr->LeftNode->data.NodeData
+    inOrder(ptr->LeftNode); //éè¿´ï¼š è¼¸å…¥çš„æ™‚å€™æœƒè®Šæˆ  ptr->LeftNode->data.NodeData
     inOrder(ptr->MiddleNode);
     inOrder(ptr->RightNode);
 }
 void GO(string *goalArray,int MAX_Col){
 	DecisionTree MaxNode;
 	for(int i=1;i<4;i++){
-		if(goalArray[i]!=""){ // ¬°¤FÂo±¼¤w¸g¦³¸­¸`ÂIªºovercastÄİ©Ê 
-			Data_Str data=make_goal_data(goalArray[i],MAX_Col);  //®Ú¾ÚSUNNY»s§@DATA 
-			MaxNode=findMaxGain(data); //¦bSUNNYªº¸ê®Æ¸Ì§ä³Ì¤j    ¸òµÛµe¤@¦¸¨Mµ¦¾ğ 
-			if(MaxNode.left.nextNode==""){  //¬°¤F¸Ñ¨M³Ì«á¤@¨Bªºstrong¦bfind_yes_no®É¥¼³Q¤ÀÃş 
+		if(goalArray[i]!=""){ // ç‚ºäº†æ¿¾æ‰å·²ç¶“æœ‰è‘‰ç¯€é»çš„overcastå±¬æ€§ 
+			Data_Str data=make_goal_data(goalArray[i],MAX_Col);  //æ ¹æ“šSUNNYè£½ä½œDATA 
+			MaxNode=findMaxGain(data); //åœ¨SUNNYçš„è³‡æ–™è£¡æ‰¾æœ€å¤§    è·Ÿè‘—ç•«ä¸€æ¬¡æ±ºç­–æ¨¹ 
+			if(MaxNode.left.nextNode==""){  //ç‚ºäº†è§£æ±ºæœ€å¾Œä¸€æ­¥çš„strongåœ¨find_yes_noæ™‚æœªè¢«åˆ†é¡ 
 				if(MaxNode.left.goalYES>MaxNode.left.goalNO){
 					MaxNode.left.nextNode="Yes";
 				}else{
 					MaxNode.left.nextNode="No";
-				}				
+				}
 			}
 			if(MaxNode.middle.nextNode==""){
 				if(MaxNode.middle.goalYES>MaxNode.middle.goalNO){
 					MaxNode.middle.nextNode="Yes";
 				}else{
 					MaxNode.middle.nextNode="No";
-				}				
+				}
 			}
 			if(MaxNode.right.nextNode==""){
 				if(MaxNode.right.goalYES>MaxNode.right.goalNO){
 					MaxNode.right.nextNode="Yes";
 				}else{
 					MaxNode.right.nextNode="No";
-				}				
+				}
 			}
-			createTreeNode(MaxNode,goalArray[i]); //«Ø¾ğ 
+			createTreeNode(MaxNode,goalArray[i]); //å»ºæ¨¹ 
 		}
 	}
 }
@@ -334,11 +334,11 @@ int main() {
 	data.D_row=15;
 	data.D_col=6;
 	DecisionTree MaxNode;
-	data.Data=createBaseData(data.D_row,data.D_col); //  Åª¨úÀÉ®×data
-	MaxNode=findMaxGain(data); // §ä¨ìhead¾ğªº®Ú¸`ÂI 
-	createTreeNode(MaxNode,MaxNode.middle.goalString); // «Ø¾ğ 
-	string *goalArray=returnGoalArray(MaxNode.col); // §ä³Ì¤j¸ê°TÀò§QÄæªº¦r¦ê¦ê¦C 
-	if(MaxNode.left.nextNode!=""){   // ¬°¤F±Novercast±q»s§@¤pªí®É±Æ°£¡A¤w¦syes 
+	data.Data=createBaseData(data.D_row,data.D_col); //  è®€å–æª”æ¡ˆdata
+	MaxNode=findMaxGain(data); // æ‰¾åˆ°headæ¨¹çš„æ ¹ç¯€é»
+	createTreeNode(MaxNode,MaxNode.middle.goalString); // å»ºæ¨¹ 
+	string *goalArray=returnGoalArray(MaxNode.col); // æ‰¾æœ€å¤§è³‡è¨Šç²åˆ©æ¬„çš„å­—ä¸²é™£åˆ—
+	if(MaxNode.left.nextNode!=""){   // ç‚ºäº†å°‡overcastå¾è£½ä½œå°è¡¨æ™‚æ’é™¤ï¼Œå·²å­˜yes 
 		goalArray[1]="";
 	}
 	if(MaxNode.middle.nextNode!=""){
@@ -347,7 +347,7 @@ int main() {
 	if(MaxNode.right.nextNode!=""){
 		goalArray[3]="";
 	}
-	GO(goalArray,MaxNode.col);  // ¿é¤J³Ì¤j¸ê°TÀò§QÄæªº¦r¦ê¦ê¦C¥H«Ø³y¾ğ 
-	inOrder(head);  // ¤¤§Ç¨«³X 
+	GO(goalArray,MaxNode.col);  // è¼¸å…¥æœ€å¤§è³‡è¨Šç²åˆ©æ¬„çš„å­—ä¸²é™£åˆ—ä»¥å»ºé€ æ¨¹ 
+	inOrder(head);  // ä¸­åºèµ°è¨ª 
 	return 0;
 }
