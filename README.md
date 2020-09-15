@@ -13,7 +13,7 @@
 
 演算法：使用ID3計算資訊獲利熵(Entropy)衡量屬性分類資料的能力，資訊獲利最大值(Gain)的屬性當分類依據。<br>
 公式<br>
-![image](https://github.com/leodflag/CPP_DecisionTree/blob/master/img/Entropy.png)
+![image](https://github.com/leodflag/CPP_DecisionTree/blob/master/img/Entropy.png)<br>
 ![image](https://github.com/leodflag/CPP_DecisionTree/blob/master/img/Gain.png)
 
 ## 計算範例
@@ -24,7 +24,11 @@
 ### 決策樹結構
 ![image](https://github.com/leodflag/CPP_DecisionTree/blob/master/img/Data_Str.png)
 ![image](https://github.com/leodflag/CPP_DecisionTree/blob/master/img/goalData.png)
+![image](https://github.com/leodflag/CPP_DecisionTree/blob/master/img/DecisionTree.png)
 ![image](https://github.com/leodflag/CPP_DecisionTree/blob/master/img/NODE.png)
+
+決策樹的一個node<br>
+![image](https://github.com/leodflag/CPP_DecisionTree/blob/master/img/one%20node.png)
 
 ## 設計說明(部份函式)
 
